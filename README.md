@@ -117,7 +117,7 @@ on the default port 3000.
 
 3. Build the containers
 
-    ```shel
+    ```shell
     docker-compose build
     ```
 
