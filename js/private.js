@@ -36,7 +36,7 @@ $( document ).ready(function() {
 	          	$(`<tr>
 	          			<td>`+response.title+`</td>
 						<td><a href='`+url+`/`+studyType+`/`+studyID+`/`+response._id+`'>`+url+`/`+studyType+`/`+studyID+`/`+response._id+`</a></td>
-						<td><a href="" class="copyText" data-placement="right" data-clipboard-text="`+url+`/`+studyType+`/`+studyID+`/`+response._id+`" data-toggle="tooltip" title="Copied!">Copy</a></td>
+						<td><a href="" class="copyText" data-bs-placement="right" data-clipboard-text="`+url+`/`+studyType+`/`+studyID+`/`+response._id+`" data-bs-toggle="tooltip" title="Copied!">Copy</a></td>
 						<td><a class='text-danger' data-studyid="`+studyID+`" data-resid="`+response._id+`" href="">Delete</a></td>
 					</tr>`).appendTo($('#responses_table_body'));
 	          	$('#responses_table').show();

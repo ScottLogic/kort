@@ -15,7 +15,7 @@
 		<tr>
 			<td><%= singleStudy.completeResponses[z].title %></a></td>
 			<td><a target="_blank" href='<%= url %>/<%= singleStudy.type %>/<%= singleStudy._id %>/<%= singleStudy.completeResponses[z]._id %>'><%= url %>/<%= singleStudy.type %>/<%= singleStudy._id %>/<%= singleStudy.completeResponses[z]._id %></a></td>
-			<td><a href="" class="copyText" data-placement="right" data-clipboard-text="<%= url %>/<%= singleStudy.type %>/<%= singleStudy._id %>/<%= singleStudy.completeResponses[z]._id %>" data-toggle="tooltip" title="Copied!">Copy</a></td>
+			<td><a href="" class="copyText" data-bs-placement="right" data-clipboard-text="<%= url %>/<%= singleStudy.type %>/<%= singleStudy._id %>/<%= singleStudy.completeResponses[z]._id %>" data-bs-toggle="tooltip" title="Copied!">Copy</a></td>
 			<td><a class='text-danger' data-studyid="<%= singleStudy._id %>" data-resid="<%= singleStudy.completeResponses[z]._id %>" href="">Delete</a></td>
 		</tr>
 	<% } %>
