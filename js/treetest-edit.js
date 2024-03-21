@@ -39,3 +39,8 @@ function bindFunctions(){
 		$("#tree").jstree("toggle_node", data.selected);
 	});
 }
+
+$(function() {
+	var treeData = $('#studydatatree').data("value");
+	init_jsTree(treeData);
+})

@@ -10,15 +10,10 @@
 		<script src="/clipboard/clipboard.min.js"></script>
 		<script type="text/javascript" src="/js/private.js"></script>
 		<script type="text/javascript" src="/js/treetest-edit.js"></script>
-		<script type="text/javascript">
-			$( document ).ready(function() {
-				var treeData = <%- singleStudy.data.tree %>;
-		   		init_jsTree(treeData);
-			});
-		</script>
 	</head>
 	<body>
 	<%- include('../partials/admin_header.ejs') %>
+	<div id="studydatatree" data-value="<%= singleStudy.data.tree %>"></div>
 	<div class="container">
 		<%- include('../partials/editwarning.ejs') %>
 		<a href='/studies'><i class="fa fa-chevron-left icon-sm" aria-hidden="true"></i> Back to Studies</a>

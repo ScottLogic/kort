@@ -8,22 +8,16 @@
 		<!-- custom css -->
 		<link rel="stylesheet" type="text/css" href="/css/treetest.css" />
 		<title>Kort Treetest</title>
+		<script type="text/javascript" src="/js/treetest.js"/></script>
+		<script type="text/javascript" src="/js/treetest-view.js"></script>
 	</head>
 
-	<script>
-			$(document).ready(function() {
-				var input_tasks = "<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%><%= singleStudy.data.tasks[i] %>;<% } %>";
-				var treeData = $("#treedata").val();
-				var selectableParents = "<%= singleStudy.data.selectableParents %>";
-				var showSiblings = "<%= singleStudy.data.showSiblings %>";
-				setup(input_tasks,treeData,selectableParents,showSiblings);
-			});
-	</script>
-
 	<body class="background-darkbluegray">
-		<input id='hiddenTree' type='text' value="<%= singleStudy.data.tree %>">
+		<div id="studyTasks" data-value="<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%><%= singleStudy.data.tasks[i] %>;<% } %>"></div>
+		<div id="selectableParents" data-value="<%= singleStudy.data.selectableParents %>"></div>
+		<div id="showSiblings" data-value="<%= singleStudy.data.showSiblings %>"></div>
 
-		<script type="text/javascript" src="/js/treetest.js"/></script>
+		<input id='hiddenTree' type='text' value="<%= singleStudy.data.tree %>">		
 
 		<form method="POST" action="/submitResult">
 			<input name="id" id='id' type='text' hidden value="<%= singleStudy._id %>" />
