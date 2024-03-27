@@ -27,7 +27,8 @@
 							<th>Title / Name</th>
 							<th>Date Submitted</th>
 							<% for(var i=0; i<study.data.tasks.length; i++) {%>
-							<th>Task <%= i+1 %></th>
+							<th>Task <%= i+1 %> Answers</th>
+							<th>Task <%= i+1 %> Time Taken </th>
 							<% } %>
 						</tr>
 					</thead>
@@ -37,7 +38,8 @@
 							<td><%= completeResponses[i].title %></td>
 							<td><%= completeResponses[i].date.toLocaleDateString() %> (<%= completeResponses[i].date.toLocaleTimeString() %>)</td>
 							<% for(var j=0; j<completeResponses[i].data.length; j++) {%>
-							<td><%= completeResponses[i].data[j].toString().replace(/[',]+/g, '/') %></td>
+							<td><%= completeResponses[i].data[j].answer.toString().replace(/[',]+/g, '/') %></td>
+							<td><%= completeResponses[i].data[j].timeSpent %></td>
 							<% } %>
 						</tr>
 					<% } %>
