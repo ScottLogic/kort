@@ -43,7 +43,7 @@ function disableButton(buttonID){
 function bindNodeSelection(){
 	//When node is selected (clicked), write full path of node ids
 	$('#tree').on("select_node.jstree", function (e, data) {
-	  tasks.answers[tasks.idx] = setHistory(data.node)
+	  tasks.results[tasks.idx].answer = setHistory(data.node)
 	  	enableButton('#nextTaskButton');
 	});
 	$('#tree').on("deselect_node.jstree", function (e, data) {
@@ -78,19 +78,23 @@ function updateProgressBar(){
 //tasks js object to store task related functions and data
 var tasks = {
 	list: [], //task descriptions
-	answers: [], //full path of nodeIds when answer is selected
+	results: [], // objects containing answer and time spent in milliseconds
+	timerStart: null,
 	idx: 0,
 	add: function (taskStr) {
 		this.list.push(taskStr);
-		this.answers.push(false);
+		this.results.push({ answer: false, timeSpent: 0 });
 	},
 	next:function() {
 		if (!(this.idx == this.list.length-1)){
+			this.recordTimeSpent();
 			this.idx = this.idx + 1;
 			this.set(this.idx);
 			updateProgressBar();
+			this.resetTimer();
 		} else {
-			$('#hiddenResults').val(JSON.stringify(tasks.answers));
+			this.recordTimeSpent();
+			$('#hiddenResults').val(JSON.stringify(this.results))
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
@@ -99,22 +103,38 @@ var tasks = {
 
 	},
 	prev:function() {
-	    if (this.idx === 0) {
-    		this.idx = this.list.length;
-	    }
-	    this.idx = this.idx - 1;
-	    this.set(this.idx);
+		this.recordTimeSpent();
+		if (this.idx === 0) {
+			this.idx = this.list.length;
+		}
+		this.idx = this.idx - 1;
+		this.set(this.idx);
+		this.resetTimer();
 	},
 	set:function(number){
 		this.idx = number;
 		$('#taskDesc').html(this.list[number]);
 		$('#taskNum').html("Task "+(number+1)+" of "+this.list.length);
 		resetTree();
-		if(this.answers[this.idx].length > 0){
-			//need to pass a copy of node path to expandToNode (or else it alters tasks.answers)
-			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
+		if(this.results[this.idx].answer.length > 0){
+			//need to pass a copy of node path to expandToNode (or else it alters tasks.results[].answer)
+			var copyOfHistory = $.extend(true, [], this.results[this.idx].answer);
 			expandToNode(copyOfHistory);
 		}
+	},
+	resetTimer:function(){
+		this.timerStart = Date.now();
+	},
+	recordTimeSpent:function(){
+		const timerEnd = Date.now();
+		const timerStart = this.timerStart;
+
+		// Otherwise, calling this function twice in a row will double the recorded time spent
+		this.resetTimer();
+
+		// Total time will be added up, since the user could have started on this
+		// task, moved to the next one, then come back to this one
+		this.results[this.idx].timeSpent += timerEnd - timerStart;
 	}
 }
 //---------------------Task List Initialization----------------------
@@ -140,4 +160,5 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	tasks.set(0);
 	disableButton('#nextTaskButton');
 	bindNextButton();
+	tasks.resetTimer();
 }
