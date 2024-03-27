@@ -59,7 +59,16 @@ module.exports = {
             data: {
                 showSiblings: true,
                 selectableParents: true,
-                tasks: ['Where is the Apple?','Where is the Bacon?'],
+                tasks: [
+                    {
+                        question: 'Where is the Apples?',
+                        expectedAnswers:['Fruits,Apple']
+                    },
+                    {
+                        question: 'Where is the Bacon?',
+                        expectedAnswers:['Meats,Bacon']
+                    }
+                ],
                 tree: JSON.stringify([{text:'Fruits',children:['Apple','Banana']},{text:'Meats',children:['Bacon','Turkey']}])
             },
             status: 'closed',
@@ -130,9 +139,17 @@ module.exports = {
         });
     },
     update: function (req, res, next) {
-        var tasks = req.body.tasks.split(/\r?\n/).map(function(item) {
-             return item.trim();
-        }).filter(function(n){ return n != '' });
+        var tasks = [];
+        for (var i = 0; i < req.body.question.length; i++) {
+            if (req.body.question[i] == '') {
+                continue;
+            } 
+
+            tasks[tasks.length] = {
+                question: req.body.question[i],
+                expectedAnswers: req.body.expectedAnswers[i].substring(0,req.body.expectedAnswers[i].length-1).split(';')
+            }            
+        }
 
         var clean_id = sanitize(req.body.id);
         var clean_ownerid = sanitize(req.user._id);
