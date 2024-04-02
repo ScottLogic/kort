@@ -126,3 +126,21 @@ h3.header {
 table.dataTable tbody td {
     vertical-align: middle;
 }
+
+.expected-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    .list-group-item {
+        display: flex;
+        gap: 1rem;
+        align-items: baseline;
+    }
+}
+
+.icon-button {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}

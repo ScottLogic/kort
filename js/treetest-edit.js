@@ -52,23 +52,24 @@ function bindFunctions(){
 		var node = $("#tree").jstree("get_selected");
 		var nodePath = $('#tree').jstree('get_path', node)
 
-		expectedAnswersElement=$(this).closest('table').closest('td').find('.expectedAnswers');
+		expectedAnswersElement=$('.expectedAnswers');
 		expectedAnswers = expectedAnswersElement.val() + nodePath + ';';
 		expectedAnswersElement.val(expectedAnswers);
 
 		var answerElement = document.getElementById('newAnswer').querySelector('template').content.cloneNode(true);
-		answerElement.querySelector('button').textContent=nodePath;
+		answerElement.querySelector('p').textContent=nodePath;
 		$(this).closest('tr').find('.list-group').append($(answerElement));		
     });
 
 	$("#tasks").on("click", ".deleteAnswerBtn", function () {
-		buttonElement = $(this).closest("button");
+		const expectedAnswerContainer = $(this).closest("div");
+		const expectedAnswerText = expectedAnswerContainer.find('p').first();
 		
-		expectedAnswersElement=$(this).closest('table').closest('td').find('.expectedAnswers');
-		expectedAnswers = expectedAnswersElement.val().replace(buttonElement.text() + ';', "");
+		const expectedAnswersElement=$('input[name=expectedAnswers]');
+		const expectedAnswers = expectedAnswersElement.val().replace(expectedAnswerText.text() + ';', "");
 		expectedAnswersElement.val(expectedAnswers);
 		
-		buttonElement.remove();
+		expectedAnswerContainer.remove();
     });
 }
 
