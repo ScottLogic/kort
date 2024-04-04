@@ -64,13 +64,11 @@ function bindFunctions(){
 
 	$("#tasks").on("click", ".deleteAnswerBtn", function () {
 		const expectedAnswerContainer = $(this).closest("div");
-		const expectedAnswerText = expectedAnswerContainer.find('p').first();
+		const divIndex = expectedAnswerContainer.index();
 
 		const expectedAnswersElement=$(this).closest('td').find('.expectedAnswers');
-		expectedAnswers = JSON.parse(expectedAnswersElement.val());
-		expectedAnswers = expectedAnswers.filter(function(answer) {
-			return JSON.stringify(answer) != expectedAnswerText.text()
-		})
+		expectedAnswers = JSON.parse(expectedAnswersElement.val());		
+		expectedAnswers.splice(divIndex, 1);
 
 		expectedAnswersElement.val(JSON.stringify(expectedAnswers));
 		expectedAnswerContainer.remove();
