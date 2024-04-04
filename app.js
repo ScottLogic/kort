@@ -134,6 +134,12 @@ app.use(bodyParser.json());
 
 require('./server/routes.js')(app, passport, flash, allowGoogleAuth, allowUserRegistration);
 
-app.listen(port, function () {
+const { createServer } = require('node:http');
+const httpServer = createServer(app);
+
+const { setupSocketServer } = require('./server/socket.js');
+setupSocketServer(httpServer);
+
+httpServer.listen(port, function () {
 	logger.info('Kort running on port: ' + port);
 });
