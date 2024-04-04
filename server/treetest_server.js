@@ -139,12 +139,15 @@ module.exports = {
         });
     },
     update: function (req, res, next) {
+        //Updates the tasks and their expected answers for the respective tree test 
         var tasks = [];
         for (var i = 0; i < req.body.question.length; i++) {
-            if (req.body.question[i] == '') {
+            if (req.body.question[i].trim() == '') {
+                //Do not save the question and related answers if the question is empty or a whitespace
                 continue;
             } 
 
+            //Adds a new element to tasks array. Every element contains a string field for question and an array field for storing expected answers
             tasks[tasks.length] = {
                 question: req.body.question[i],
                 expectedAnswers: JSON.parse(req.body.expectedAnswers[i])
@@ -154,6 +157,8 @@ module.exports = {
         var clean_id = sanitize(req.body.id);
         var clean_ownerid = sanitize(req.user._id);
 
+        //Uses Mongoose Model.findOne() api function to get study document from the database with matching study id. 
+        //It then updates the retrieved study document with the captured form data and saves it back.
         Study.findOne({_id: clean_id, ownerID: clean_ownerid},
             function (err, study) {
             if (err) {
