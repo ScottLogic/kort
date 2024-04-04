@@ -50,25 +50,29 @@ function bindFunctions(){
 
 	$("#tasks").on("click", ".addAnswerBtn", function () {
 		var node = $("#tree").jstree("get_selected");
-		var nodePath = $('#tree').jstree('get_path', node)
+		var nodes = $('#tree').jstree('get_path', node, '/').split('/');
 
-		expectedAnswersElement=$('.expectedAnswers');
-		expectedAnswers = expectedAnswersElement.val() + nodePath + ';';
-		expectedAnswersElement.val(expectedAnswers);
+		expectedAnswersElement=$(this).closest('td').find('.expectedAnswers');
+		expectedAnswers = JSON.parse(expectedAnswersElement.val());
+		expectedAnswers.push(nodes);
+		expectedAnswersElement.val(JSON.stringify(expectedAnswers));	
 
 		var answerElement = document.getElementById('newAnswer').querySelector('template').content.cloneNode(true);
-		answerElement.querySelector('p').textContent=nodePath;
-		$(this).closest('tr').find('.list-group').append($(answerElement));		
+		answerElement.querySelector('p').textContent=JSON.stringify(nodes);
+		$(this).closest('tr').find('.list-group').append($(answerElement));	
     });
 
 	$("#tasks").on("click", ".deleteAnswerBtn", function () {
 		const expectedAnswerContainer = $(this).closest("div");
 		const expectedAnswerText = expectedAnswerContainer.find('p').first();
-		
-		const expectedAnswersElement=$('input[name=expectedAnswers]');
-		const expectedAnswers = expectedAnswersElement.val().replace(expectedAnswerText.text() + ';', "");
-		expectedAnswersElement.val(expectedAnswers);
-		
+
+		const expectedAnswersElement=$(this).closest('td').find('.expectedAnswers');
+		expectedAnswers = JSON.parse(expectedAnswersElement.val());
+		expectedAnswers = expectedAnswers.filter(function(answer) {
+			return JSON.stringify(answer) != expectedAnswerText.text()
+		})
+
+		expectedAnswersElement.val(JSON.stringify(expectedAnswers));
 		expectedAnswerContainer.remove();
     });
 }

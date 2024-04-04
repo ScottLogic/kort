@@ -67,7 +67,7 @@
 									<tr>
 										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"></textarea></td>
 										<td class="expected-answers">
-											<input hidden name='expectedAnswers' class='expectedAnswers'/>
+											<input hidden name='expectedAnswers[]' class='expectedAnswers' value="[]"/>
 											<div class="list-group">
 											</div>
 											<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default">
@@ -93,15 +93,11 @@
 									<tr>
 										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"><%= singleStudy.data.tasks[i].question %></textarea></td>
 										<td class="expected-answers">
-											<input hidden name='expectedAnswers' class='expectedAnswers' value="
-												<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
-													<%= singleStudy.data.tasks[i].expectedAnswers[j]+';' %>
-												<% } %>
-											"/>
+											<input hidden name='expectedAnswers[]' class='expectedAnswers' value="<%= '[' + singleStudy.data.tasks[i].expectedAnswers.map(answer => JSON.stringify(answer)).join(',') + ']' %>"/>											
 											<div class="list-group">
 												<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
 													<div class="list-group-item">
-														<p><%= singleStudy.data.tasks[i].expectedAnswers[j] %></p>
+														<p><%= JSON.stringify(singleStudy.data.tasks[i].expectedAnswers[j]) %></p>
 														<button type="button" class="deleteAnswerBtn btn btn-default icon-button">
 															<span class="fa fa-minus" aria-hidden="true"></span>
 															Remove

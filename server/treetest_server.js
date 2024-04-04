@@ -62,11 +62,11 @@ module.exports = {
                 tasks: [
                     {
                         question: 'Where is the Apples?',
-                        expectedAnswers:['Fruits,Apple']
+                        expectedAnswers:[["Fruits", "Apple"]]
                     },
                     {
                         question: 'Where is the Bacon?',
-                        expectedAnswers:['Meats,Bacon']
+                        expectedAnswers:[["Meats", "Bacon"]]
                     }
                 ],
                 tree: JSON.stringify([{text:'Fruits',children:['Apple','Banana']},{text:'Meats',children:['Bacon','Turkey']}])
@@ -147,7 +147,7 @@ module.exports = {
 
             tasks[tasks.length] = {
                 question: req.body.question[i],
-                expectedAnswers: req.body.expectedAnswers[i].substring(0,req.body.expectedAnswers[i].length-1).split(';')
+                expectedAnswers: JSON.parse(req.body.expectedAnswers[i])
             }            
         }
 
