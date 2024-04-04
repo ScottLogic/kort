@@ -65,26 +65,19 @@
 								New Task
 								<template>
 									<tr>
-										<td contenteditable='true'><textarea name="question[]" style='width:100%' rows="2" cols="50"></textarea></td>
-										<td>
-											<input hidden name='expectedAnswers[]' class='expectedAnswers'/>
-											<table class="table table-condensed">
-												<tr>
-													<td class="no-border" style="width:10%">
-														<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default" data-toggle="tooltip" data-placement="right" title="Adds the selected tree node as the expected answer">
-															<i class="fa fa-plus" aria-hidden="true"></i> 
-														</button>
-													</td>
-													<td class="no-border">
-														<div class="list-group">
-														</div>
-													</td>
-												</tr>
-											</table>									
+										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"></textarea></td>
+										<td class="expected-answers">
+											<input hidden name='expectedAnswers' class='expectedAnswers'/>
+											<div class="list-group">
+											</div>
+											<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default">
+												<span class="fa fa-plus" aria-hidden="true"></span>
+												Add answer
+											</button>
 										</td>
 										<td><button name="deletetask" type="button" class="deleteTaskBtn btn btn-default" data-toggle="tooltip" data-placement="right" title="Deletes the task"><i class="fa fa-trash"></i></button></td>
 									</tr>
-								</template>						
+								</template>
 							</button>
 						</p>	
 						<table id="tasks" class="table table-striped">
@@ -98,28 +91,37 @@
 							<tbody>
 								<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%>
 									<tr>
-										<td contenteditable='true'><textarea name="question[]" style='width:100%' rows="2" cols="50"><%= singleStudy.data.tasks[i].question %></textarea></td>
-										<td>
-											<input hidden name='expectedAnswers[]' class='expectedAnswers' value="<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%><%= singleStudy.data.tasks[i].expectedAnswers[j]+';' %><% } %>"/>
-											<table class="table table-condensed">
-												<tr>
-													<td class="no-border" style="width:10%">
-														<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default" data-toggle="tooltip" data-placement="right" title="Adds the selected tree node as the expected answer">
-															<i class="fa fa-plus" aria-hidden="true"></i>
-															<template>
-																<button type="button" class="deleteAnswerBtn list-group-item list-group-item-action" data-toggle="tooltip" data-placement="right" title="Deletes the answer when clicked">tt</button>
-															</template>	 
+										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"><%= singleStudy.data.tasks[i].question %></textarea></td>
+										<td class="expected-answers">
+											<input hidden name='expectedAnswers' class='expectedAnswers' value="
+												<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
+													<%= singleStudy.data.tasks[i].expectedAnswers[j]+';' %>
+												<% } %>
+											"/>
+											<div class="list-group">
+												<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
+													<div class="list-group-item">
+														<p><%= singleStudy.data.tasks[i].expectedAnswers[j] %></p>
+														<button type="button" class="deleteAnswerBtn btn btn-default icon-button">
+															<span class="fa fa-minus" aria-hidden="true"></span>
+															Remove
 														</button>
-													</td>
-													<td class="no-border">
-														<div class="list-group">
-															<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
-																<button type="button" class="deleteAnswerBtn list-group-item list-group-item-action" data-toggle="tooltip" data-placement="right" title="Deletes the answer when clicked"><%= singleStudy.data.tasks[i].expectedAnswers[j] %></button>
-															<% } %>
-														</div>
-													</td>
-												</tr>
-											</table>										
+													</div>
+												<% } %>
+											</div>
+											<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default">
+												<span class="fa fa-plus" aria-hidden="true"></span>
+												Add answer
+												<template>
+													<div class="list-group-item">
+														<p></p>
+														<button type="button" class="deleteAnswerBtn btn btn-default">
+															<span class="fa fa-minus" aria-hidden="true"></span>
+															Remove
+														</button>
+													</div>
+												</template>
+											</button>
 										</td>
 										<td><button name="deletetask" type="button" class="deleteTaskBtn btn btn-default" data-toggle="tooltip" data-placement="right" title="Deletes the task"><i class="fa fa-trash"></i></button></td>
 									</tr>
