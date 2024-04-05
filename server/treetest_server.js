@@ -148,10 +148,12 @@ module.exports = {
             } 
 
             //Adds a new element to tasks array. Every element contains a string field for question and an array field for storing expected answers
-            tasks[tasks.length] = {
-                question: req.body.question[i],
-                expectedAnswers: JSON.parse(req.body.expectedAnswers[i])
-            }            
+            tasks.push(
+                {
+                    question: req.body.question[i],
+                    expectedAnswers: JSON.parse(req.body.expectedAnswers[i])
+                }
+            );           
         }
 
         var clean_id = sanitize(req.body.id);
