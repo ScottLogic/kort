@@ -49,8 +49,8 @@ function bindFunctions(){
     });
 
 	$("#tasks").on("click", ".addAnswerBtn", function () {
-		var node = $("#tree").jstree("get_selected");
-		var nodes = $('#tree').jstree('get_path', node, '/').split('/');
+		var node = $("#tree").jstree().get_selected();
+		var nodes = $('#tree').jstree().get_path(node);
 
 		expectedAnswersElement=$(this).closest('td').find('.expectedAnswers');
 		expectedAnswers = JSON.parse(expectedAnswersElement.val());
