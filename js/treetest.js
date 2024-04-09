@@ -7,6 +7,7 @@ function bindNextButton(){
 		}
 	});
 }
+
 function bindCloseSiblingsOnOpen(){
 	$('#tree').on("before_open.jstree", function (e, data) {
 		var siblings = $("#tree").jstree("get_node", data.node.parent).children;
@@ -15,6 +16,7 @@ function bindCloseSiblingsOnOpen(){
 		})
 	});
 }
+
 function initializeTreeViewObject(treeStructure){
 	$('#tree').jstree({
 		"core" : {
@@ -32,32 +34,38 @@ function initializeTreeViewObject(treeStructure){
 		$("#tree").jstree('close_all');
 	});
 }
+
 function enableButton(buttonID){
 	$(buttonID).removeClass('disabled');
 	$(buttonID).addClass('btn-amber');
 }
+
 function disableButton(buttonID){
 	$(buttonID).removeClass('btn-amber');
 	$(buttonID).addClass('disabled');
 }
+
 function bindNodeSelection(){
 	//When node is selected (clicked), write full path of node ids
 	$('#tree').on("select_node.jstree", function (e, data) {
-	  tasks.answers[tasks.idx] = setHistory(data.node)
-	  	enableButton('#nextTaskButton');
+		tasks.answers[tasks.idx] = setHistory(data.node);
+		enableButton('#nextTaskButton');
 	});
 	$('#tree').on("deselect_node.jstree", function (e, data) {
 	  disableButton('#nextTaskButton');
 	});
 }
+
 function resetTree(){
 	$('#tree').jstree('close_all');
 	disableButton('#nextTaskButton');
 }
+
 function setHistory(node){
 	var path = $('#tree').jstree('get_path',node);
 	return path;
 }
+
 function singleClickExpand(parents) {
 	$('#tree').on("changed.jstree", function (e, data) {
 		$("#tree").jstree("toggle_node", data.selected);
@@ -69,11 +77,13 @@ function singleClickExpand(parents) {
 		}
 	});
 }
+
 function updateProgressBar(){
 	var status = ((tasks.idx/tasks.list.length)*100)+'%';
 	$('#progressbar').css("width", status);
 	$('#progressbar').html('');
 }
+
 //--------------------------Task JS Object---------------------------
 //tasks js object to store task related functions and data
 var tasks = {
