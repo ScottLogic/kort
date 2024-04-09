@@ -58,8 +58,11 @@ function bindNodeSelection(){
 }
 
 function resetTree(){
+	const { emitCloseNodeEvent } = socket;
+	socket.emitCloseNodeEvent = () => {};
 	$('#tree').jstree('close_all');
 	disableButton('#nextTaskButton');
+	socket.emitCloseNodeEvent = emitCloseNodeEvent;
 }
 
 function setHistory(node){
