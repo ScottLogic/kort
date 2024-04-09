@@ -12,6 +12,9 @@ function setupSocketServer(httpServer) {
 		});
 
 		socket.on('page load', saveEventToDb('page load'));
+		socket.on('activate node', saveEventToDb('activate node'));
+		socket.on('open node', saveEventToDb('open node'));
+		socket.on('close node', saveEventToDb('close node'));
 	});
 }
 

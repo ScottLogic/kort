@@ -32,6 +32,7 @@ function initializeTreeViewObject(treeStructure){
 
 	$("#tree").on('ready.jstree', function() {
 		$("#tree").jstree('close_all');
+		bindEvents();
 	});
 }
 
@@ -145,6 +146,30 @@ var socket = {
 		this._emitEvent({}, 'page load');
 	},
 
+	emitActivateNodeEvent: function(node) {
+		const data = {
+			node: $('#tree').jstree().get_path(node),
+			current_task_index: tasks.idx,
+		};
+		this._emitEvent(data, 'activate node');
+	},
+
+	emitOpenNodeEvent: function(node) {
+		const data = {
+			node: $('#tree').jstree().get_path(node),
+			current_task_index: tasks.idx,
+		};
+		this._emitEvent(data, 'open node');
+	},
+
+	emitCloseNodeEvent: function(node) {
+		const data = {
+			node: $('#tree').jstree().get_path(node),
+			current_task_index: tasks.idx,
+		};
+		this._emitEvent(data, 'close node');
+	},
+
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
@@ -185,4 +210,33 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 
 	socket.connect();
 	socket.emitPageLoadEvent();
+}
+
+function bindEvents() {
+	bindEmitOnActivateNode();
+	bindEmitOnOpenNode();
+	bindEmitOnCloseNode();
+}
+
+function bindEmitOnActivateNode() {
+	// Fires when the user activates a node (by clicking on it)
+	$('#tree').on('activate_node.jstree', function (_, { node }) {
+		socket.emitActivateNodeEvent(node);
+	});
+}
+
+function bindEmitOnOpenNode() {
+	// Fires when the user opens a parent node to expose its children, either by
+	// activating the parent node itself, or by activating the button next to it
+	$('#tree').on('open_node.jstree', function (_, { node }) {
+		socket.emitOpenNodeEvent(node);
+	});
+}
+
+function bindEmitOnCloseNode() {
+	// Fires when the user close a parent node to hideits children, either by
+	// activating the parent node itself, or by activating the button next to it
+	$('#tree').on('close_node.jstree', function (_, { node }) {
+		socket.emitCloseNodeEvent(node);
+	});
 }
