@@ -129,7 +129,9 @@ var tasks = {
 			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
 			expandToNode(copyOfHistory);
 		}
-	}
+		this.onSet.forEach(callback => callback(number));
+	},
+	onSet: [],
 }
 
 var socket = {
@@ -171,6 +173,10 @@ var socket = {
 			current_task_index: tasks.idx,
 		};
 		this._emitEvent(data, 'close node');
+	},
+
+	emitTaskChangedEvent: function(newTaskIndex) {
+		this._emitEvent({ new_task_index: newTaskIndex }, 'task changed');
 	},
 
 	_emitEvent: function(data, eventType) {
@@ -219,6 +225,7 @@ function bindEvents() {
 	bindEmitOnActivateNode();
 	bindEmitOnOpenNode();
 	bindEmitOnCloseNode();
+	bindEmitOnTaskChanged();
 }
 
 function bindEmitOnActivateNode() {
@@ -242,4 +249,8 @@ function bindEmitOnCloseNode() {
 	$('#tree').on('close_node.jstree', function (_, { node }) {
 		socket.emitCloseNodeEvent(node);
 	});
+}
+
+function bindEmitOnTaskChanged() {
+	tasks.onSet.push(number => socket.emitTaskChangedEvent(number));
 }
