@@ -16,6 +16,7 @@ function setupSocketServer(httpServer) {
 		socket.on('open node', saveEventToDb('open node'));
 		socket.on('close node', saveEventToDb('close node'));
 		socket.on('task changed', saveEventToDb('task changed'));
+		socket.on('submit response', saveEventToDb('submit response'));
 	});
 }
 

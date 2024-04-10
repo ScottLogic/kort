@@ -105,6 +105,7 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
+			this.onSubmit.forEach(callback => callback(tasks.answers));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
@@ -132,6 +133,7 @@ var tasks = {
 		this.onSet.forEach(callback => callback(number));
 	},
 	onSet: [],
+	onSubmit: [],
 }
 
 var socket = {
@@ -177,6 +179,10 @@ var socket = {
 
 	emitTaskChangedEvent: function(newTaskIndex) {
 		this._emitEvent({ new_task_index: newTaskIndex }, 'task changed');
+	},
+
+	emitSubmitResponseEvent: function(answers) {
+		this._emitEvent({ answers }, 'submit response');
 	},
 
 	_emitEvent: function(data, eventType) {
@@ -226,6 +232,7 @@ function bindEvents() {
 	bindEmitOnOpenNode();
 	bindEmitOnCloseNode();
 	bindEmitOnTaskChanged();
+	bindEmitOnSubmitResponse();
 }
 
 function bindEmitOnActivateNode() {
@@ -253,4 +260,8 @@ function bindEmitOnCloseNode() {
 
 function bindEmitOnTaskChanged() {
 	tasks.onSet.push(number => socket.emitTaskChangedEvent(number));
+}
+
+function bindEmitOnSubmitResponse() {
+	tasks.onSubmit.push(answers => socket.emitSubmitResponseEvent(answers));
 }
