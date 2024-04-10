@@ -59,7 +59,16 @@ module.exports = {
             data: {
                 showSiblings: true,
                 selectableParents: true,
-                tasks: ['Where is the Apple?','Where is the Bacon?'],
+                tasks: [
+                    {
+                        question: 'Where is the Apples?',
+                        expectedAnswers:[["Fruits", "Apple"]]
+                    },
+                    {
+                        question: 'Where is the Bacon?',
+                        expectedAnswers:[["Meats", "Bacon"]]
+                    }
+                ],
                 tree: JSON.stringify([{text:'Fruits',children:['Apple','Banana']},{text:'Meats',children:['Bacon','Turkey']}])
             },
             status: 'closed',
@@ -130,13 +139,28 @@ module.exports = {
         });
     },
     update: function (req, res, next) {
-        var tasks = req.body.tasks.split(/\r?\n/).map(function(item) {
-             return item.trim();
-        }).filter(function(n){ return n != '' });
+        //Updates the tasks and their expected answers for the respective tree test 
+        var tasks = [];
+        for (var i = 0; i < req.body.question.length; i++) {
+            if (req.body.question[i].trim() == '') {
+                //Do not save the question and related answers if the question is empty or a whitespace
+                continue;
+            } 
+
+            //Adds a new element to tasks array. Every element contains a string field for question and an array field for storing expected answers
+            tasks.push(
+                {
+                    question: req.body.question[i],
+                    expectedAnswers: JSON.parse(req.body.expectedAnswers[i])
+                }
+            );           
+        }
 
         var clean_id = sanitize(req.body.id);
         var clean_ownerid = sanitize(req.user._id);
 
+        //Uses Mongoose Model.findOne() api function to get study document from the database with matching study id. 
+        //It then updates the retrieved study document with the captured form data and saves it back.
         Study.findOne({_id: clean_id, ownerID: clean_ownerid},
             function (err, study) {
             if (err) {
