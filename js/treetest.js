@@ -185,6 +185,11 @@ var socket = {
 		this._emitEvent({ answers }, 'submit response');
 	},
 
+	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
+		const data = { new_visibility_state: newVisibilityState };
+		this._emitEvent(data, 'window visibility changed');
+	},
+
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
@@ -233,6 +238,7 @@ function bindEvents() {
 	bindEmitOnCloseNode();
 	bindEmitOnTaskChanged();
 	bindEmitOnSubmitResponse();
+	bindEmitOnWindowVisibilityChanged();
 }
 
 function bindEmitOnActivateNode() {
@@ -264,4 +270,10 @@ function bindEmitOnTaskChanged() {
 
 function bindEmitOnSubmitResponse() {
 	tasks.onSubmit.push(answers => socket.emitSubmitResponseEvent(answers));
+}
+
+function bindEmitOnWindowVisibilityChanged() {
+	document.addEventListener('visibilitychange', () => {
+		socket.emitWindowVisibilityChangedEvent(document.visibilityState);
+	});
 }
