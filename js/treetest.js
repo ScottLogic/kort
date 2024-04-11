@@ -141,6 +141,10 @@ var socket = {
 		})
 	},
 
+	emitPageLoadEvent: function() {
+		this._emitEvent({}, 'page load');
+	},
+
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
@@ -180,4 +184,5 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	bindNextButton();
 
 	socket.connect();
+	socket.emitPageLoadEvent();
 }

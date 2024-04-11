@@ -10,6 +10,8 @@ function setupSocketServer(httpServer) {
 		socket.on('disconnect', () => {
 			logger.info('Socket disconnected: ' + socket.id);
 		});
+
+		socket.on('page load', saveEventToDb('page load'));
 	});
 }
 
