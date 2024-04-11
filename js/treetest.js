@@ -140,6 +140,19 @@ var socket = {
 			})
 		})
 	},
+
+	_emitEvent: function(data, eventType) {
+		const json = JSON.stringify({
+			id: crypto.randomUUID(),
+			timestamp: new Date().toISOString(),
+			tree_test_id: document.split('/').pop(),
+			...data,
+		});
+		const emitUntilAcknowledged = () => this._socket
+			.timeout(2000)
+			.emit(eventType, json, (err) => err && emitUntilAcknowledged());
+		emitUntilAcknowledged();
+	},
 }
 
 //---------------------Task List Initialization----------------------
