@@ -194,7 +194,7 @@ var socket = {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
 			timestamp: new Date().toISOString(),
-			tree_test_id: document.split('/').pop(),
+			tree_test_id: document.baseURI.split('/').pop(),
 			...data,
 		});
 		const emitUntilAcknowledged = () => this._socket
