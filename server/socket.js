@@ -43,7 +43,7 @@ function saveEventToDb(eventType) {
 			eventInDb.type = eventType;
 			eventInDb.iso_timestamp_sent = extract(data, 'timestamp');
 			eventInDb.iso_timestamp_received = isoTimestampReceived;
-			eventInDb.tree_test_id = extract(data, 'tree_test_id');
+			eventInDb.response_id = extract(data, 'response_id');
 			eventInDb.data = data;
 
 			eventInDb.save((err) => {

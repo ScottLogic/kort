@@ -5,7 +5,7 @@ var Event = new mongoose.Schema({
 	type: String,
 	iso_timestamp_sent: String,
 	iso_timestamp_received: String,
-	tree_test_id: String,
+	response_id: String,
 	data: Object,
 });
 
