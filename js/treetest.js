@@ -58,11 +58,8 @@ function bindNodeSelection(){
 }
 
 function resetTree(){
-	const { emitCloseNodeEvent } = socket;
-	socket.emitCloseNodeEvent = () => {};
 	$('#tree').jstree('close_all');
 	disableButton('#nextTaskButton');
-	socket.emitCloseNodeEvent = emitCloseNodeEvent;
 }
 
 function setHistory(node){
@@ -124,7 +121,18 @@ var tasks = {
 		this.idx = number;
 		$('#taskDesc').html(this.list[number]);
 		$('#taskNum').html("Task "+(number+1)+" of "+this.list.length);
+
+		// Resetting the tree between tasks results in all open nodes closing, but
+		// we don't want to register these as close node events, because they aren't
+		// meaningfully user actions. So we pause listening for close node events
+		const { emitCloseNodeEvent } = socket;
+		socket.emitCloseNodeEvent = () => {};
+
 		resetTree();
+
+		// Start listening for close node events again
+		socket.emitCloseNodeEvent = emitCloseNodeEvent;
+
 		if(this.answers[this.idx].length > 0){
 			//need to pass a copy of node path to expandToNode (or else it alters tasks.answers)
 			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
