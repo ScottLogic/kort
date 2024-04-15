@@ -41,9 +41,9 @@ function saveEventToDb(eventType) {
 			const eventInDb = new Event();
 			eventInDb.id = extract(data, 'id');
 			eventInDb.type = eventType;
-			eventInDb.iso_timestamp_sent = extract(data, 'timestamp');
-			eventInDb.iso_timestamp_received = isoTimestampReceived;
-			eventInDb.response_id = extract(data, 'response_id');
+			eventInDb.isoTimestampSent = extract(data, 'timestamp');
+			eventInDb.isoTimestampReceived = isoTimestampReceived;
+			eventInDb.responseId = extract(data, 'responseId');
 			eventInDb.data = data;
 
 			eventInDb.save((err) => {

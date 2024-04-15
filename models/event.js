@@ -3,9 +3,9 @@ var mongoose = require('mongoose');
 var Event = new mongoose.Schema({
 	id: String,
 	type: String,
-	iso_timestamp_sent: String,
-	iso_timestamp_received: String,
-	response_id: String,
+	isoTimestampSent: String,
+	isoTimestampReceived: String,
+	responseId: String,
 	data: Object,
 });
 

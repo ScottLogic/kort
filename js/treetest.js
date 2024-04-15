@@ -158,7 +158,7 @@ var socket = {
 	emitActivateNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			current_task_index: tasks.idx,
+			currentTaskIndex: tasks.idx,
 		};
 		this._emitEvent(data, 'activate node');
 	},
@@ -166,7 +166,7 @@ var socket = {
 	emitOpenNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			current_task_index: tasks.idx,
+			currentTaskIndex: tasks.idx,
 		};
 		this._emitEvent(data, 'open node');
 	},
@@ -174,13 +174,13 @@ var socket = {
 	emitCloseNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			current_task_index: tasks.idx,
+			currentTaskIndex: tasks.idx,
 		};
 		this._emitEvent(data, 'close node');
 	},
 
 	emitTaskChangedEvent: function(newTaskIndex) {
-		this._emitEvent({ new_task_index: newTaskIndex }, 'task changed');
+		this._emitEvent({ newTaskIndex }, 'task changed');
 	},
 
 	emitSubmitResponseEvent: function(answers) {
@@ -188,7 +188,7 @@ var socket = {
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
-		const data = { new_visibility_state: newVisibilityState };
+		const data = { newVisibilityState };
 		this._emitEvent(data, 'window visibility changed');
 	},
 
@@ -196,7 +196,7 @@ var socket = {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
 			timestamp: new Date().toISOString(),
-			response_id: responseId,
+			responseId,
 			...data,
 		});
 		const emitUntilAcknowledged = () => this._socket
