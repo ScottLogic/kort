@@ -6,7 +6,7 @@ function setupSocketServer(httpServer) {
 	const server = new Server(httpServer);
 
 	server.on('connect', (socket) => {
-		logger.info('Socket connected: ' + socket.id);
+		logger.info(`Socket connected: ${socket.id}`);
 		socket.on('disconnect', (reason) => {
 			logger.info(`Socket disconnected: ${socket.id}. Reason: ${reason}`);
 		});
@@ -28,7 +28,8 @@ function saveEventToDb(eventType) {
 
 		Event.findOne({ id: data.id }, (err, event) => {
 			if (err) {
-				logger.error('server/socket.js: error finding Event:', err);
+				const errString = typeof(err) === 'string' ? err : JSON.stringify(err);
+				logger.error(`server/socket.js: error finding Event: ${errString}`);
 				return;
 			}
 
@@ -47,11 +48,12 @@ function saveEventToDb(eventType) {
 
 			eventInDb.save((err) => {
 				if (err) {
-					logger.error('server/socket.js: error saving Event:', err);
+					const errString = typeof(err) === 'string' ? err : JSON.stringify(err);
+					logger.error(`server/socket.js: error saving Event: ${errString}`);
 					throw err;
 				}
 
-				logger.info('Saved Event to database:', eventInDb.id);
+				logger.info(`Saved Event to database: ${eventInDb.id}`);
 			});
 		});
 	};
