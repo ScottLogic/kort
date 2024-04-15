@@ -7,8 +7,8 @@ function setupSocketServer(httpServer) {
 
 	server.on('connect', (socket) => {
 		logger.info('Socket connected: ' + socket.id);
-		socket.on('disconnect', () => {
-			logger.info('Socket disconnected: ' + socket.id);
+		socket.on('disconnect', (reason) => {
+			logger.info(`Socket disconnected: ${socket.id}. Reason: ${reason}`);
 		});
 
 		socket.on('page load', saveEventToDb('page load'));

@@ -144,8 +144,8 @@ var socket = {
 		this._socket.on('connect', () => {
 			console.debug('Socket connected');
 		});
-		this._socket.on('disconnect', () => {
-			console.debug('Socket disconnected');
+		this._socket.on('disconnect', (reason) => {
+			console.debug(`Socket disconnected. Reason: ${reason}`);
 		});
 	},
 
