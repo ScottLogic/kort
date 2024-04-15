@@ -3,9 +3,9 @@ const Event = require('mongoose').model('Event');
 const logger = require('./logger.js');
 
 function setupSocketServer(httpServer) {
-	const socketIo = new Server(httpServer);
+	const server = new Server(httpServer);
 
-	socketIo.on('connect', (socket) => {
+	server.on('connect', (socket) => {
 		logger.info('Socket connected: ' + socket.id);
 		socket.on('disconnect', () => {
 			logger.info('Socket disconnected: ' + socket.id);

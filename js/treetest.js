@@ -143,10 +143,10 @@ var socket = {
 		this._socket = io();
 		this._socket.on('connect', () => {
 			console.debug('Socket connected');
-			this._socket.on('disconnect', () => {
-				console.debug('Socket disconnected');
-			})
-		})
+		});
+		this._socket.on('disconnect', () => {
+			console.debug('Socket disconnected');
+		});
 	},
 
 	emitPageLoadEvent: function() {
