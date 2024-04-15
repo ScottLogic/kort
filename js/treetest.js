@@ -136,8 +136,6 @@ var tasks = {
 	onSubmit: [],
 }
 
-const responseId = document.baseURI.split('/').pop();
-
 var socket = {
 	_socket: null,
 
@@ -196,7 +194,7 @@ var socket = {
 		const json = JSON.stringify({
 			id: crypto.randomUUID(),
 			timestamp: new Date().toISOString(),
-			responseId,
+			responseId: document.getElementById('resid').value,
 			...data,
 		});
 		const emitUntilAcknowledged = () => this._socket
