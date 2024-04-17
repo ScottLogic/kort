@@ -102,7 +102,7 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			this.onSubmit.forEach(callback => callback(tasks.answers));
+			window.dispatchEvent(new CustomEvent('submittask', { answers: this.answers }));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
@@ -138,10 +138,9 @@ var tasks = {
 			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
 			expandToNode(copyOfHistory);
 		}
-		this.onSet.forEach(callback => callback(number));
+
+		window.dispatchEvent(new CustomEvent('taskchanged', { newTaskIndex: number }));
 	},
-	onSet: [],
-	onSubmit: [],
 }
 
 var socket = {
@@ -273,11 +272,11 @@ function bindEmitOnCloseNode() {
 }
 
 function bindEmitOnTaskChanged() {
-	tasks.onSet.push(number => socket.emitTaskChangedEvent(number));
+	window.addEventListener('taskchanged', ({ newTaskIndex }) => socket.emitTaskChangedEvent(newTaskIndex));
 }
 
 function bindEmitOnSubmitResponse() {
-	tasks.onSubmit.push(answers => socket.emitSubmitResponseEvent(answers));
+	window.addEventListener('submittask', ({ answers }) => socket.emitSubmitResponseEvent(answers));
 }
 
 function bindEmitOnWindowVisibilityChanged() {
