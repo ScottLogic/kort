@@ -163,7 +163,7 @@ var socket = {
 	emitActivateNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx,
+			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'activate node');
 	},
@@ -171,7 +171,7 @@ var socket = {
 	emitOpenNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx,
+			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'open node');
 	},
@@ -179,7 +179,7 @@ var socket = {
 	emitCloseNodeEvent: function(node) {
 		const data = {
 			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx,
+			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'close node');
 	},
