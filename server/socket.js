@@ -26,7 +26,7 @@ function saveEventToDb(eventType) {
 		const data = JSON.parse(eventJson);
 		const isoTimestampReceived = new Date().toISOString();
 
-		Event.findOne({ id: data.id }, (err, event) => {
+		Event.findOne({ _id: data.id }, (err, event) => {
 			if (err) {
 				const errString = typeof(err) === 'string' ? err : JSON.stringify(err);
 				logger.error(`server/socket.js: error finding Event: ${errString}`);
@@ -39,7 +39,7 @@ function saveEventToDb(eventType) {
 			}
 
 			const eventInDb = new Event();
-			eventInDb.id = extract(data, 'id');
+			eventInDb._id = extract(data, 'id');
 			eventInDb.type = eventType;
 			eventInDb.isoTimestampSent = extract(data, 'timestamp');
 			eventInDb.isoTimestampReceived = isoTimestampReceived;

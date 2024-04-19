@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var Event = new mongoose.Schema({
-	id: String,
+	_id: mongoose.Schema.Types.UUID,
 	type: String,
 	isoTimestampSent: String,
 	isoTimestampReceived: String,
