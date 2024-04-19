@@ -272,7 +272,7 @@ function bindEmitOnCloseNode() {
 }
 
 function bindEmitOnTaskChanged() {
-	window.addEventListener('taskchanged', ({ detail }) => socket.emitTaskChangedEvent(detail.newTaskIndex));
+	window.addEventListener('taskchanged', ({ detail }) => socket.emitTaskChangedEvent(detail.newTaskIndex + 1));
 }
 
 function bindEmitOnSubmitResponse() {
