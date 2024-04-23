@@ -73,6 +73,7 @@ const clientP = mongoose.connect(mongoURL).then(m => m.connection.getClient())
 require('./models/user');
 require('./models/study');
 require('./models/upload');
+require('./models/event');
 
 //setup a default admin account in Mongo
 require('./server/createadmin_user')(adminUser, adminPassword);
@@ -134,6 +135,12 @@ app.use(bodyParser.json());
 
 require('./server/routes.js')(app, passport, flash, allowGoogleAuth, allowUserRegistration);
 
-app.listen(port, function () {
+const { createServer } = require('node:http');
+const httpServer = createServer(app);
+
+const { setupSocketServer } = require('./server/socket.js');
+setupSocketServer(httpServer);
+
+httpServer.listen(port, function () {
 	logger.info('Kort running on port: ' + port);
 });
