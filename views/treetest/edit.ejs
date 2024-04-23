@@ -45,7 +45,7 @@
 					      <p>When an element is expanded, other elements on that level will be hidden. This can be useful for viewing large structures.</p>
 					    </div>
 					    <% } else { %>
-					   <div class="checkbox">
+					   	<div class="checkbox">
 					      <label><input type="checkbox" name="showSiblings">Hide Siblings</label>
 					        <p>When an element is expanded, other elements on that level will be hidden. This can be useful for viewing large structures.</p>
 					    </div>
@@ -55,9 +55,75 @@
 				</div>
 				<div class='col-sm-8'>
 					<div class="well">
-						<p><label for="tasks">Tasks</label>
-						<br>One task per line (task numbers will be added automatically).</p>
-						<textarea style='width:100%' name="tasks" rows="15" cols="30" id="tasks"><% for(var j=0; j<singleStudy.data.tasks.length; j++) {%><%= singleStudy.data.tasks[j]+'\n' %><% } %></textarea>
+						<p>
+							<label for="tasks">Tasks</label>
+							<br>One task per line (task numbers will be added automatically).
+						</p>		
+						<p>			
+							<button id="newTask" type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="right" title="Adds a new task">
+								<i class="fa fa-plus" aria-hidden="true"></i> 
+								New Task
+								<template>
+									<tr>
+										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"></textarea></td>
+										<td class="expected-answers">
+											<input hidden name='expectedAnswers[]' class='expectedAnswers' value="[]"/>
+											<div class="list-group">
+											</div>
+											<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default">
+												<span class="fa fa-plus" aria-hidden="true"></span>
+												Add answer
+											</button>
+										</td>
+										<td><button name="deletetask" type="button" class="deleteTaskBtn btn btn-default" data-bs-toggle="tooltip" data-bs-placement="right" title="Deletes the task"><i class="fa fa-trash"></i></button></td>
+									</tr>
+								</template>
+							</button>
+						</p>	
+						<table id="tasks" class="table table-striped">
+							<thead>
+								<tr>
+									<th style="width:50%">Question</th>
+									<th style="width:45%">Expected Answers</th>
+									<th style="width:5%"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%>
+									<tr>
+										<td><textarea name="question[]" style='width:100%' rows="2" cols="50"><%= singleStudy.data.tasks[i].question %></textarea></td>
+										<td class="expected-answers">
+											<input hidden name='expectedAnswers[]' class='expectedAnswers' value="<%= '[' + singleStudy.data.tasks[i].expectedAnswers.map(answer => JSON.stringify(answer)).join(',') + ']' %>"/>											
+											<div class="list-group">
+												<% for(var j=0; j<singleStudy.data.tasks[i].expectedAnswers.length; j++) {%>
+													<div class="list-group-item">
+														<p><%= JSON.stringify(singleStudy.data.tasks[i].expectedAnswers[j]) %></p>
+														<button type="button" class="deleteAnswerBtn btn btn-default icon-button">
+															<span class="fa fa-minus" aria-hidden="true"></span>
+															Remove
+														</button>
+													</div>
+												<% } %>
+											</div>
+											<button id="newAnswer" type="button" class="addAnswerBtn btn btn-default">
+												<span class="fa fa-plus" aria-hidden="true"></span>
+												Add answer
+												<template>
+													<div class="list-group-item">
+														<p></p>
+														<button type="button" class="deleteAnswerBtn btn btn-default">
+															<span class="fa fa-minus" aria-hidden="true"></span>
+															Remove
+														</button>
+													</div>
+												</template>
+											</button>
+										</td>
+										<td><button name="deletetask" type="button" class="deleteTaskBtn btn btn-default" data-bs-toggle="tooltip" data-bs-placement="right" title="Deletes the task"><i class="fa fa-trash"></i></button></td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
 					</div>
 				</div>
 			</div>

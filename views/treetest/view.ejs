@@ -14,7 +14,7 @@
 	</head>
 
 	<body class="background-darkbluegray">
-		<div id="studyTasks" data-value="<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%><%= singleStudy.data.tasks[i] %>;<% } %>"></div>
+		<div id="studyTasks" data-value="<% for(var i=0; i<singleStudy.data.tasks.length; i++) {%><%= singleStudy.data.tasks[i].question %>;<% } %>"></div>
 		<div id="selectableParents" data-value="<%= singleStudy.data.selectableParents %>"></div>
 		<div id="showSiblings" data-value="<%= singleStudy.data.showSiblings %>"></div>
 
