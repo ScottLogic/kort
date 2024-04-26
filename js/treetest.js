@@ -49,7 +49,8 @@ function disableButton(buttonID){
 function bindNodeSelection(){
 	//When node is selected (clicked), write full path of node ids
 	$('#tree').on("select_node.jstree", function (e, data) {
-		tasks.answers[tasks.idx] = setHistory(data.node);
+		tasks.answers[tasks.idx] = getNodePath(data.node);
+		storeClickedNode(data.node);
 		enableButton('#nextTaskButton');
 	});
 	$('#tree').on("deselect_node.jstree", function (e, data) {
@@ -62,9 +63,8 @@ function resetTree(){
 	disableButton('#nextTaskButton');
 }
 
-function setHistory(node){
-	var path = $('#tree').jstree('get_path',node);
-	return path;
+function getNodePath(node){
+	return $('#tree').jstree().get_path(node);
 }
 
 function singleClickExpand(parents) {
@@ -85,15 +85,28 @@ function updateProgressBar(){
 	$('#progressbar').html('');
 }
 
+function storeClickedNode(node){
+	nodePath = getNodePath(node)
+	index = tasks.clickedNodes[tasks.idx].length - 1
+	lastStoredNodePath = tasks.clickedNodes[tasks.idx][index]
+
+	//In some cases multiple events may get fired, but we want to capture the node data just once. Do not store data if the last stored node is the same.
+	if(JSON.stringify(nodePath) != JSON.stringify(lastStoredNodePath)) {
+		tasks.clickedNodes[tasks.idx].push(nodePath);
+	}
+}
+
 //--------------------------Task JS Object---------------------------
 //tasks js object to store task related functions and data
 var tasks = {
 	list: [], //task descriptions
 	answers: [], //full path of nodeIds when answer is selected
+	clickedNodes: [], //full path of all the nodes that were clicked (either expanded or selected) for a task
 	idx: 0,
 	add: function (taskStr) {
 		this.list.push(taskStr);
 		this.answers.push(false);
+		this.clickedNodes.push([]);
 	},
 	next:function() {
 		if (!(this.idx == this.list.length-1)){
@@ -102,20 +115,13 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			window.dispatchEvent(new CustomEvent('submittask', { detail: { answers: this.answers } }));
+			window.dispatchEvent(new CustomEvent('submittask', { detail: { clickedNodes: this.clickedNodes } }));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
 			$('#nextTaskButton').html('Finish')
 		}
 
-	},
-	prev:function() {
-	    if (this.idx === 0) {
-    		this.idx = this.list.length;
-	    }
-	    this.idx = this.idx - 1;
-	    this.set(this.idx);
 	},
 	set:function(number){
 		this.idx = number;
@@ -132,12 +138,6 @@ var tasks = {
 
 		// Start listening for close node events again
 		socket.emitCloseNodeEvent = emitCloseNodeEvent;
-
-		if(this.answers[this.idx].length > 0){
-			//need to pass a copy of node path to expandToNode (or else it alters tasks.answers)
-			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
-			expandToNode(copyOfHistory);
-		}
 
 		window.dispatchEvent(new CustomEvent('taskchanged', { detail: { newTaskIndex: number } }));
 	},
@@ -162,7 +162,7 @@ var socket = {
 
 	emitActivateNodeEvent: function(node) {
 		const data = {
-			node: $('#tree').jstree().get_path(node),
+			node: getNodePath(node),
 			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'activate node');
@@ -170,7 +170,7 @@ var socket = {
 
 	emitOpenNodeEvent: function(node) {
 		const data = {
-			node: $('#tree').jstree().get_path(node),
+			node: getNodePath(node),
 			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'open node');
@@ -178,7 +178,7 @@ var socket = {
 
 	emitCloseNodeEvent: function(node) {
 		const data = {
-			node: $('#tree').jstree().get_path(node),
+			node: getNodePath(node),
 			currentTaskIndex: tasks.idx + 1,
 		};
 		this._emitEvent(data, 'close node');
@@ -188,8 +188,8 @@ var socket = {
 		this._emitEvent({ newTaskIndex }, 'task changed');
 	},
 
-	emitSubmitResponseEvent: function(answers) {
-		this._emitEvent({ answers }, 'submit response');
+	emitSubmitResponseEvent: function(clickedNodes) {
+		this._emitEvent({ clickedNodes }, 'submit response');
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
@@ -259,7 +259,8 @@ function bindEmitOnOpenNode() {
 	// Fires when the user opens a parent node to expose its children, either by
 	// activating the parent node itself, or by activating the button next to it
 	$('#tree').on('open_node.jstree', function (_, { node }) {
-		socket.emitOpenNodeEvent(node);
+		storeClickedNode(node);
+		socket.emitOpenNodeEvent(nodePath);
 	});
 }
 
@@ -276,7 +277,7 @@ function bindEmitOnTaskChanged() {
 }
 
 function bindEmitOnSubmitResponse() {
-	window.addEventListener('submittask', ({ detail }) => socket.emitSubmitResponseEvent(detail.answers));
+	window.addEventListener('submittask', ({ detail }) => socket.emitSubmitResponseEvent(detail.clickedNodes));
 }
 
 function bindEmitOnWindowVisibilityChanged() {
