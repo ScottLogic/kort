@@ -73,28 +73,15 @@ function getNodePath(node){
 	return $('#tree').jstree().get_path(node);
 }
 
-function storeClickedNode(node){
-	nodePath = getNodePath(node)
-	index = tasks.clickedNodes[tasks.idx].length - 1
-	lastStoredNodePath = tasks.clickedNodes[tasks.idx][index]
-
-	//In some cases multiple events may get fired, but we want to capture the node data just once. Do not store data if the last stored node is the same.
-	if(JSON.stringify(nodePath) != JSON.stringify(lastStoredNodePath)) {
-		tasks.clickedNodes[tasks.idx].push(nodePath);
-	}
-}
-
 //--------------------------Task JS Object---------------------------
 //tasks js object to store task related functions and data
 var tasks = {
 	list: [], //task descriptions
 	answers: [], //full path of nodeIds when answer is selected
-	clickedNodes: [], //full path of all the nodes that were clicked (either expanded or selected) for a task
 	idx: 0,
 	add: function (taskStr) {
 		this.list.push(taskStr);
 		this.answers.push(false);
-		this.clickedNodes.push([]);
 	},
 	next:function() {
 		if (!(this.idx == this.list.length-1)){
@@ -103,7 +90,7 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			window.dispatchEvent(new CustomEvent('submittask', { detail: { clickedNodes: this.clickedNodes } }));
+			window.dispatchEvent(new CustomEvent('submittask'));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
@@ -176,8 +163,8 @@ var socket = {
 		this._emitEvent({ newTaskIndex }, 'task changed');
 	},
 
-	emitSubmitResponseEvent: function(clickedNodes) {
-		this._emitEvent({ clickedNodes }, 'submit response');
+	emitSubmitResponseEvent: function() {
+		this._emitEvent({}, 'submit response');
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
@@ -240,7 +227,6 @@ function bindOnSelectNode() {
 	// Fires when the user selects a node (by clicking on it)
 	$('#tree').on('select_node.jstree', function (_, { node }) {
 		tasks.answers[tasks.idx] = getNodePath(node);
-		storeClickedNode(node);
 		enableButton('#nextTaskButton');
 
 		socket.emitSelectNodeEvent(node);
@@ -258,7 +244,6 @@ function bindEmitOnOpenNode() {
 	// Fires when the user opens a parent node to expose its children, either by
 	// activating the parent node itself, or by activating the button next to it
 	$('#tree').on('open_node.jstree', function (_, { node }) {
-		storeClickedNode(node);
 		socket.emitOpenNodeEvent(node);
 	});
 }
@@ -276,7 +261,7 @@ function bindEmitOnTaskChanged() {
 }
 
 function bindEmitOnSubmitResponse() {
-	window.addEventListener('submittask', ({ detail }) => socket.emitSubmitResponseEvent(detail.clickedNodes));
+	window.addEventListener('submittask', () => socket.emitSubmitResponseEvent());
 }
 
 function bindEmitOnWindowVisibilityChanged() {
