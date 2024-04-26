@@ -46,25 +46,9 @@ function disableButton(buttonID){
 	$(buttonID).addClass('disabled');
 }
 
-function bindNodeSelection(){
-	//When node is selected (clicked), write full path of node ids
-	$('#tree').on("select_node.jstree", function (e, data) {
-		tasks.answers[tasks.idx] = getNodePath(data.node);
-		storeClickedNode(data.node);
-		enableButton('#nextTaskButton');
-	});
-	$('#tree').on("deselect_node.jstree", function (e, data) {
-	  disableButton('#nextTaskButton');
-	});
-}
-
 function resetTree(){
 	$('#tree').jstree('close_all');
 	disableButton('#nextTaskButton');
-}
-
-function getNodePath(node){
-	return $('#tree').jstree().get_path(node);
 }
 
 function singleClickExpand(parents) {
@@ -83,6 +67,10 @@ function updateProgressBar(){
 	var status = ((tasks.idx/tasks.list.length)*100)+'%';
 	$('#progressbar').css("width", status);
 	$('#progressbar').html('');
+}
+
+function getNodePath(node){
+	return $('#tree').jstree().get_path(node);
 }
 
 function storeClickedNode(node){
@@ -160,12 +148,12 @@ var socket = {
 		this._emitEvent({}, 'page load');
 	},
 
-	emitActivateNodeEvent: function(node) {
+	emitSelectNodeEvent: function(node) {
 		const data = {
 			node: getNodePath(node),
 			currentTaskIndex: tasks.idx + 1,
 		};
-		this._emitEvent(data, 'activate node');
+		this._emitEvent(data, 'select node');
 	},
 
 	emitOpenNodeEvent: function(node) {
@@ -223,7 +211,6 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	}
 	//create treeview structure from database information
 	initializeTreeViewObject(input_tree);
-	bindNodeSelection();
 	if(input_closeSiblings){
 		bindCloseSiblingsOnOpen();
 	}
@@ -239,8 +226,9 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	socket.emitPageLoadEvent();
 }
 
-function bindEvents() {
-	bindEmitOnActivateNode();
+function bindEvents() {	
+	bindOnSelectNode();
+	bindOnDeselectNode();
 	bindEmitOnOpenNode();
 	bindEmitOnCloseNode();
 	bindEmitOnTaskChanged();
@@ -248,10 +236,21 @@ function bindEvents() {
 	bindEmitOnWindowVisibilityChanged();
 }
 
-function bindEmitOnActivateNode() {
-	// Fires when the user activates a node (by clicking on it)
-	$('#tree').on('activate_node.jstree', function (_, { node }) {
-		socket.emitActivateNodeEvent(node);
+function bindOnSelectNode() {
+	// Fires when the user selects a node (by clicking on it)
+	$('#tree').on('select_node.jstree', function (_, { node }) {
+		tasks.answers[tasks.idx] = getNodePath(node);
+		storeClickedNode(node);
+		enableButton('#nextTaskButton');
+
+		socket.emitSelectNodeEvent(node);
+	});
+}
+
+function bindOnDeselectNode() {
+	// Fires when the user de-selects a node (by clicking on a selected node)
+	$('#tree').on("deselect_node.jstree", function (_, _) {
+		disableButton('#nextTaskButton');
 	});
 }
 
@@ -260,7 +259,7 @@ function bindEmitOnOpenNode() {
 	// activating the parent node itself, or by activating the button next to it
 	$('#tree').on('open_node.jstree', function (_, { node }) {
 		storeClickedNode(node);
-		socket.emitOpenNodeEvent(nodePath);
+		socket.emitOpenNodeEvent(node);
 	});
 }
 
