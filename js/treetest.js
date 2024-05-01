@@ -157,7 +157,7 @@ var socket = {
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
 		//https://html.spec.whatwg.org/multipage/interaction.html#visibility-state
-		const isVisible = newVisibilityState == 'visible' ? true : false
+		const isVisible = newVisibilityState === 'visible';
 
 		const data = { visible: isVisible };
 		this._emitEvent(data, 'window_visibility_changed');

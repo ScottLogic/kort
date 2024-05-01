@@ -38,8 +38,10 @@ function saveEventToDb() {
 				return;
 			}
 
-			const eventInDb = new Event(data);
-			eventInDb.isoTimestampReceived = isoTimestampReceived;
+			const eventInDb = new Event({
+				...data,
+				isoTimestampReceived,
+			});
 
 			eventInDb.save((err) => {
 				if (err) {
