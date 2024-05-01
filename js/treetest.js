@@ -114,7 +114,7 @@ var tasks = {
 		// Start listening for close node events again
 		socket.emitCloseNodeEvent = emitCloseNodeEvent;
 
-		window.dispatchEvent(new CustomEvent('taskchanged', { detail: { newTaskIndex: number } }));
+		window.dispatchEvent(new CustomEvent('taskchanged',));
 	},
 }
 
@@ -129,54 +129,54 @@ var socket = {
 		this._socket.on('disconnect', (reason) => {
 			console.debug(`Socket disconnected. Reason: ${reason}`);
 		});
-	},
+	},	
 
 	emitPageLoadEvent: function() {
-		this._emitEvent({}, 'page load');
+		this._emitEvent({}, 'page_load');
 	},
 
 	emitSelectNodeEvent: function(node) {
-		const data = {
-			node: getNodePath(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'select node');
+		this._emitNodeActionEvent(node, 'select_node');
 	},
 
 	emitOpenNodeEvent: function(node) {
-		const data = {
-			node: getNodePath(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'open node');
+		this._emitNodeActionEvent(node, 'open_node');
 	},
 
 	emitCloseNodeEvent: function(node) {
-		const data = {
-			node: getNodePath(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'close node');
+		this._emitNodeActionEvent(node, 'close_node');
 	},
 
-	emitTaskChangedEvent: function(newTaskIndex) {
-		this._emitEvent({ newTaskIndex }, 'task changed');
+	emitTaskChangedEvent: function() {
+		this._emitEvent({}, 'task_changed');
 	},
 
 	emitSubmitResponseEvent: function() {
-		this._emitEvent({}, 'submit response');
+		this._emitEvent({}, 'submit_response');
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
-		const data = { newVisibilityState };
-		this._emitEvent(data, 'window visibility changed');
+		//https://html.spec.whatwg.org/multipage/interaction.html#visibility-state
+		const isVisible = newVisibilityState == 'visible' ? true : false
+
+		const data = { visible: isVisible };
+		this._emitEvent(data, 'window_visibility_changed');
+	},
+
+	_emitNodeActionEvent: function(node, eventType) {
+		const data = {
+			taskIndex: tasks.idx + 1,
+			node: getNodePath(node),
+		};
+		this._emitEvent(data, eventType);
 	},
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			id: crypto.randomUUID(),
-			timestamp: new Date().toISOString(),
+			_id: crypto.randomUUID(),
+			type: eventType,
 			responseId: document.getElementById('resid').value,
+			isoTimestampSent: new Date().toISOString(),
 			...data,
 		});
 		const emitUntilAcknowledged = () => this._socket
@@ -257,7 +257,7 @@ function bindEmitOnCloseNode() {
 }
 
 function bindEmitOnTaskChanged() {
-	window.addEventListener('taskchanged', ({ detail }) => socket.emitTaskChangedEvent(detail.newTaskIndex + 1));
+	window.addEventListener('taskchanged', () => socket.emitTaskChangedEvent());
 }
 
 function bindEmitOnSubmitResponse() {

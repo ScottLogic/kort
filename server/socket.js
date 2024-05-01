@@ -11,22 +11,22 @@ function setupSocketServer(httpServer) {
 			logger.info(`Socket disconnected: ${socket.id}. Reason: ${reason}`);
 		});
 
-		socket.on('page load', saveEventToDb('page load'));
-		socket.on('select node', saveEventToDb('select node'));
-		socket.on('open node', saveEventToDb('open node'));
-		socket.on('close node', saveEventToDb('close node'));
-		socket.on('task changed', saveEventToDb('task changed'));
-		socket.on('submit response', saveEventToDb('submit response'));
-		socket.on('window visibility changed', saveEventToDb('window visibility changed'));
+		socket.on('page_load', saveEventToDb());
+		socket.on('select_node', saveEventToDb());
+		socket.on('open_node', saveEventToDb());
+		socket.on('close_node', saveEventToDb());
+		socket.on('task_changed', saveEventToDb());
+		socket.on('submit_response', saveEventToDb());
+		socket.on('window_visibility_changed', saveEventToDb());
 	});
 }
 
-function saveEventToDb(eventType) {
+function saveEventToDb() {
 	return function(eventJson) {
 		const data = JSON.parse(eventJson);
 		const isoTimestampReceived = new Date().toISOString();
 
-		Event.findOne({ _id: data.id }, (err, event) => {
+		Event.findById(data._id, (err, event) => {
 			if (err) {
 				const errString = typeof(err) === 'string' ? err : JSON.stringify(err);
 				logger.error(`server/socket.js: error finding Event: ${errString}`);
@@ -38,13 +38,8 @@ function saveEventToDb(eventType) {
 				return;
 			}
 
-			const eventInDb = new Event();
-			eventInDb._id = extract(data, 'id');
-			eventInDb.type = eventType;
-			eventInDb.isoTimestampSent = extract(data, 'timestamp');
+			const eventInDb = new Event(data);
 			eventInDb.isoTimestampReceived = isoTimestampReceived;
-			eventInDb.responseId = extract(data, 'responseId');
-			eventInDb.data = data;
 
 			eventInDb.save((err) => {
 				if (err) {
@@ -53,16 +48,10 @@ function saveEventToDb(eventType) {
 					throw err;
 				}
 
-				logger.info(`Saved Event to database: ${eventInDb.id}`);
+				logger.info(`Saved Event to database: ${eventInDb._id}`);
 			});
 		});
 	};
-}
-
-function extract(object, property) {
-	const value = object[property];
-	delete object[property];
-	return value;
 }
 
 module.exports = { setupSocketServer };
