@@ -46,25 +46,9 @@ function disableButton(buttonID){
 	$(buttonID).addClass('disabled');
 }
 
-function bindNodeSelection(){
-	//When node is selected (clicked), write full path of node ids
-	$('#tree').on("select_node.jstree", function (e, data) {
-		tasks.answers[tasks.idx] = setHistory(data.node);
-		enableButton('#nextTaskButton');
-	});
-	$('#tree').on("deselect_node.jstree", function (e, data) {
-	  disableButton('#nextTaskButton');
-	});
-}
-
 function resetTree(){
 	$('#tree').jstree('close_all');
 	disableButton('#nextTaskButton');
-}
-
-function setHistory(node){
-	var path = $('#tree').jstree('get_path',node);
-	return path;
 }
 
 function singleClickExpand(parents) {
@@ -85,6 +69,10 @@ function updateProgressBar(){
 	$('#progressbar').html('');
 }
 
+function getNodePath(node){
+	return $('#tree').jstree().get_path(node);
+}
+
 //--------------------------Task JS Object---------------------------
 //tasks js object to store task related functions and data
 var tasks = {
@@ -102,20 +90,13 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			window.dispatchEvent(new CustomEvent('submittask', { detail: { answers: this.answers } }));
+			window.dispatchEvent(new CustomEvent('submittask'));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
 			$('#nextTaskButton').html('Finish')
 		}
 
-	},
-	prev:function() {
-	    if (this.idx === 0) {
-    		this.idx = this.list.length;
-	    }
-	    this.idx = this.idx - 1;
-	    this.set(this.idx);
 	},
 	set:function(number){
 		this.idx = number;
@@ -133,13 +114,7 @@ var tasks = {
 		// Start listening for close node events again
 		socket.emitCloseNodeEvent = emitCloseNodeEvent;
 
-		if(this.answers[this.idx].length > 0){
-			//need to pass a copy of node path to expandToNode (or else it alters tasks.answers)
-			var copyOfHistory = $.extend(true, [], this.answers[this.idx]);
-			expandToNode(copyOfHistory);
-		}
-
-		window.dispatchEvent(new CustomEvent('taskchanged', { detail: { newTaskIndex: number } }));
+		window.dispatchEvent(new CustomEvent('taskchanged',));
 	},
 }
 
@@ -154,54 +129,54 @@ var socket = {
 		this._socket.on('disconnect', (reason) => {
 			console.debug(`Socket disconnected. Reason: ${reason}`);
 		});
-	},
+	},	
 
 	emitPageLoadEvent: function() {
-		this._emitEvent({}, 'page load');
+		this._emitEvent({}, 'page_load');
 	},
 
-	emitActivateNodeEvent: function(node) {
-		const data = {
-			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'activate node');
+	emitSelectNodeEvent: function(node) {
+		this._emitNodeActionEvent(node, 'select_node');
 	},
 
 	emitOpenNodeEvent: function(node) {
-		const data = {
-			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'open node');
+		this._emitNodeActionEvent(node, 'open_node');
 	},
 
 	emitCloseNodeEvent: function(node) {
-		const data = {
-			node: $('#tree').jstree().get_path(node),
-			currentTaskIndex: tasks.idx + 1,
-		};
-		this._emitEvent(data, 'close node');
+		this._emitNodeActionEvent(node, 'close_node');
 	},
 
-	emitTaskChangedEvent: function(newTaskIndex) {
-		this._emitEvent({ newTaskIndex }, 'task changed');
+	emitTaskChangedEvent: function() {
+		this._emitEvent({}, 'task_changed');
 	},
 
-	emitSubmitResponseEvent: function(answers) {
-		this._emitEvent({ answers }, 'submit response');
+	emitSubmitResponseEvent: function() {
+		this._emitEvent({}, 'submit_response');
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
-		const data = { newVisibilityState };
-		this._emitEvent(data, 'window visibility changed');
+		//https://html.spec.whatwg.org/multipage/interaction.html#visibility-state
+		const isVisible = newVisibilityState === 'visible';
+
+		const data = { visible: isVisible };
+		this._emitEvent(data, 'window_visibility_changed');
+	},
+
+	_emitNodeActionEvent: function(node, eventType) {
+		const data = {
+			taskIndex: tasks.idx + 1,
+			node: getNodePath(node),
+		};
+		this._emitEvent(data, eventType);
 	},
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			id: crypto.randomUUID(),
-			timestamp: new Date().toISOString(),
+			_id: crypto.randomUUID(),
+			type: eventType,
 			responseId: document.getElementById('resid').value,
+			isoTimestampSent: new Date().toISOString(),
 			...data,
 		});
 		const emitUntilAcknowledged = () => this._socket
@@ -223,7 +198,6 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	}
 	//create treeview structure from database information
 	initializeTreeViewObject(input_tree);
-	bindNodeSelection();
 	if(input_closeSiblings){
 		bindCloseSiblingsOnOpen();
 	}
@@ -239,8 +213,9 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	socket.emitPageLoadEvent();
 }
 
-function bindEvents() {
-	bindEmitOnActivateNode();
+function bindEvents() {	
+	bindOnSelectNode();
+	bindOnDeselectNode();
 	bindEmitOnOpenNode();
 	bindEmitOnCloseNode();
 	bindEmitOnTaskChanged();
@@ -248,10 +223,20 @@ function bindEvents() {
 	bindEmitOnWindowVisibilityChanged();
 }
 
-function bindEmitOnActivateNode() {
-	// Fires when the user activates a node (by clicking on it)
-	$('#tree').on('activate_node.jstree', function (_, { node }) {
-		socket.emitActivateNodeEvent(node);
+function bindOnSelectNode() {
+	// Fires when the user selects a node (by clicking on it)
+	$('#tree').on('select_node.jstree', function (_, { node }) {
+		tasks.answers[tasks.idx] = getNodePath(node);
+		enableButton('#nextTaskButton');
+
+		socket.emitSelectNodeEvent(node);
+	});
+}
+
+function bindOnDeselectNode() {
+	// Fires when the user de-selects a node (by clicking on a selected node)
+	$('#tree').on("deselect_node.jstree", function (_, _) {
+		disableButton('#nextTaskButton');
 	});
 }
 
@@ -272,11 +257,11 @@ function bindEmitOnCloseNode() {
 }
 
 function bindEmitOnTaskChanged() {
-	window.addEventListener('taskchanged', ({ detail }) => socket.emitTaskChangedEvent(detail.newTaskIndex + 1));
+	window.addEventListener('taskchanged', () => socket.emitTaskChangedEvent());
 }
 
 function bindEmitOnSubmitResponse() {
-	window.addEventListener('submittask', ({ detail }) => socket.emitSubmitResponseEvent(detail.answers));
+	window.addEventListener('submittask', () => socket.emitSubmitResponseEvent());
 }
 
 function bindEmitOnWindowVisibilityChanged() {
