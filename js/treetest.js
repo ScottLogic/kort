@@ -116,7 +116,9 @@ var tasks = {
 		}
 	},
 	giveup:function() {
+		this.answers[this.idx] = ['n/a']
 		window.dispatchEvent(new CustomEvent('giveup'));
+
 		this.next();
 	},
 	set:function(number){
