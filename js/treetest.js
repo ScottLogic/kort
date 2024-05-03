@@ -1,14 +1,25 @@
 
 //--------------------Initialize Treeview Object---------------------
 function bindNextButton(){
-	$("#nextTaskButton" ).click(function() {
-		if (!$('#nextTaskButton').hasClass('disabled')){
-			tasks.next();
+	$("#nextTaskButton").on("click", function() {
+		var modelBodyElement = '<p>Are you sure you want to submit the tree test?</p>';
+		if (tasks.idx < tasks.list.length-1) {
+			modelBodyElement = '<p>Are you sure you want to move to the next task?</p>';
 		}
+
+		const modalElement = $('#nextTaskModal');	
+		modalElement.find('.modal-body').html(modelBodyElement);
+
+		modalElement.modal('show');
 	});
 }
 
 function bindEventsForModal(){
+	$("#continueModalButton").on("click", function() {
+		tasks.next();
+		$('#nextTaskModal').modal('hide');
+	});
+
 	$("#giveUpModalButton").on("click", function() {
 		tasks.giveup();
 		$('#giveUpTaskModal').modal('hide');
