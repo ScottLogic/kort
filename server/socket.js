@@ -16,7 +16,8 @@ function setupSocketServer(httpServer) {
 		socket.on('open_node', saveEventToDb());
 		socket.on('close_node', saveEventToDb());
 		socket.on('task_changed', saveEventToDb());
-		socket.on('submit_response', saveEventToDb());
+		socket.on('give_up', saveEventToDb());
+		socket.on('tree_test_completed', saveEventToDb());
 		socket.on('window_visibility_changed', saveEventToDb());
 	});
 }

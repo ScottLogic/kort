@@ -1,10 +1,28 @@
 
 //--------------------Initialize Treeview Object---------------------
 function bindNextButton(){
-	$("#nextTaskButton" ).click(function() {
-		if (!$('#nextTaskButton').hasClass('disabled')){
-			tasks.next();
+	$("#nextTaskButton").on("click", function() {
+		var modelBodyElement = '<p>Are you sure you want to submit the tree test?</p>';
+		if (tasks.idx < tasks.list.length-1) {
+			modelBodyElement = '<p>Are you sure you want to move to the next task?</p>';
 		}
+
+		const modalElement = $('#nextTaskModal');	
+		modalElement.find('.modal-body').html(modelBodyElement);
+
+		modalElement.modal('show');
+	});
+}
+
+function bindEventsForModal(){
+	$("#continueModalButton").on("click", function() {
+		tasks.next();
+		$('#nextTaskModal').modal('hide');
+	});
+
+	$("#giveUpModalButton").on("click", function() {
+		tasks.giveup();
+		$('#giveUpTaskModal').modal('hide');
 	});
 }
 
@@ -90,13 +108,18 @@ var tasks = {
 			updateProgressBar();
 		} else {
 			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			window.dispatchEvent(new CustomEvent('submittask'));
+			window.dispatchEvent(new CustomEvent('treetestcompleted'));
 			$('#submitForm').click();
 		}
 		if (this.idx == this.list.length-1){
 			$('#nextTaskButton').html('Finish')
 		}
+	},
+	giveup:function() {
+		this.answers[this.idx] = ['n/a']
+		window.dispatchEvent(new CustomEvent('giveup'));
 
+		this.next();
 	},
 	set:function(number){
 		this.idx = number;
@@ -151,8 +174,12 @@ var socket = {
 		this._emitEvent({}, 'task_changed');
 	},
 
-	emitSubmitResponseEvent: function() {
-		this._emitEvent({}, 'submit_response');
+	emitGiveUpEvent: function() {
+		this._emitEvent({}, 'give_up');
+	},	
+
+	emitTreeTestCompletedEvent: function() {
+		this._emitEvent({}, 'tree_test_completed');
 	},
 
 	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
@@ -208,6 +235,7 @@ function setup(input_tasks,input_tree,input_selectableParents,input_closeSibling
 	tasks.set(0);
 	disableButton('#nextTaskButton');
 	bindNextButton();
+	bindEventsForModal();
 
 	socket.connect();
 	socket.emitPageLoadEvent();
@@ -219,7 +247,8 @@ function bindEvents() {
 	bindEmitOnOpenNode();
 	bindEmitOnCloseNode();
 	bindEmitOnTaskChanged();
-	bindEmitOnSubmitResponse();
+	bindEmitOnGiveUp();
+	bindEmitOnTreeTestCompletion();
 	bindEmitOnWindowVisibilityChanged();
 }
 
@@ -260,8 +289,13 @@ function bindEmitOnTaskChanged() {
 	window.addEventListener('taskchanged', () => socket.emitTaskChangedEvent());
 }
 
-function bindEmitOnSubmitResponse() {
-	window.addEventListener('submittask', () => socket.emitSubmitResponseEvent());
+function bindEmitOnGiveUp() {
+	window.addEventListener('giveup', () => socket.emitGiveUpEvent());
+}
+
+
+function bindEmitOnTreeTestCompletion() {
+	window.addEventListener('treetestcompleted', () => socket.emitTreeTestCompletedEvent());
 }
 
 function bindEmitOnWindowVisibilityChanged() {
