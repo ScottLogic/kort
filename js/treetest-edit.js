@@ -1,4 +1,7 @@
 function init_jsTree(treedata){
+	//Removes jstree cached state from browser's localStorage
+	localStorage.removeItem('jstree');
+
 	$('#tree').jstree({
 	  "core" : {
 	    "animation" : 0,
@@ -15,7 +18,7 @@ function init_jsTree(treedata){
 
 function bindFunctions(){
 	$("#submitBtn").click(function() {
-	  	var treedata = JSON.stringify($('#tree').jstree(true).get_json('#', {flat:true}));
+		var treedata = JSON.stringify($('#tree').jstree(true).get_json('#', {no_id: true, no_state: true, no_li_attr: true, no_a_attr: true, no_data: true}));
     	$('#treedata').val(treedata);
     	$('#form').submit()
 	});

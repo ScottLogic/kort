@@ -49,7 +49,6 @@ function initializeTreeViewObject(treeStructure){
 	});
 
 	$("#tree").on('ready.jstree', function() {
-		$("#tree").jstree('close_all');
 		bindEvents();
 	});
 }
@@ -65,7 +64,8 @@ function disableButton(buttonID){
 }
 
 function resetTree(){
-	$('#tree').jstree('close_all');
+	$('#tree').jstree().close_all();
+	$('#tree').jstree().deselect_all(true);
 	disableButton('#nextTaskButton');
 }
 
