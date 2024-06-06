@@ -14,7 +14,7 @@ exports.test = base.test.extend({
         await use(overviewPage);
     },
 
-    overviewPage: async ({ page }, use) => {
+    studiesPage: async ({ page }, use) => {
         const studiesPage = new StudiesPage(page);
         await use(studiesPage);
     },
