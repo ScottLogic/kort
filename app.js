@@ -43,13 +43,13 @@ const flash = require('connect-flash');
 var logger = require('./server/logger.js');
 const path = require('path');
 
-// set up rate limiter: maximum of 120 requests per 10 seconds
+// set up rate limiter: maximum of 500 requests per 10 seconds
 var rateLimit = require('express-rate-limit');
 var limiter = rateLimit({
   windowMs: 1*10*1000, // 10 seconds
-  max: 120
+  max: 500, // limit each IP to 500 requests per windowMs
 });
-// apply rate limiter to all requests
+//apply rate limiter to all requests
 app.use(limiter);
 
 require('pkginfo')(module, 'version');
