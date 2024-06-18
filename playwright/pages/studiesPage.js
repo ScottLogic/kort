@@ -1,10 +1,12 @@
 export class StudiesPage {
 
+    /**
+    * @param {import('@playwright/test').Page} page
+    */
     constructor(page) {
         this.page = page;
         this.goToStudiesButton = page.locator("#newstudy");
         this.newStudiesDropdown = page.locator('.dropdown-menu');
-
     }
 
     async goto() {

@@ -1,5 +1,8 @@
 export class EditTreeTestPage {
 
+    /**
+    * @param {import('@playwright/test').Page} page
+    */
     constructor(page) {
         this.page = page;
         this.editTestTitle = page.locator('#title');
