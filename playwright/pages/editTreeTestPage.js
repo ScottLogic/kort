@@ -40,8 +40,26 @@ export class EditTreeTestPage {
         await this.row.locator('a:has-text("Remove")').click();
     }
 
+    /*
+    * The issue in here is the way kort saves the text. Because we have entered the 
+    * string previously, it does not appear in the DOM until the edited test is saved.
+    * 
+    * Therefore we still need to find the last row and navigate from there which I have left 
+    * in the code below.
+    * 
+    * An alternative could be to save the test and come back into it, however I 
+    * don't like that as we are just needlessly hitting more pages.
+    * 
+    * Have a play and see what you think - this works, but it's not clean.
+    *
+    * */
     async addAnswer(rowQuestion) {
-        const row = this.taskTable.locator('tr:has-text(\"'+rowQuestion+'\")');
-        await row.locator('button:has-text("Add answer")').click();
+        //Same as you did above to get the text area, however at the end
+        //I have locator('../..') which acts the same as it does in CMD, just navigates
+        //back two levels. From there, I now have the tr element for the last row.
+        this.emptyRow = await this.taskTable.locator('textarea').last().locator('../..');
+
+        //Now that I have the required row, I can just locate with the button ID and click
+        await this.emptyRow.locator('#newAnswer').click();
     }
 }
