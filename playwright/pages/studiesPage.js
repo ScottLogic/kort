@@ -1,5 +1,8 @@
 export class StudiesPage {
 
+    /**
+    * @param {import('@playwright/test').Page} page
+    */
     constructor(page) {
         this.page = page;
         this.header = this.page.locator('h1', { hasText: 'Studies' });
