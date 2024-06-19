@@ -17,7 +17,7 @@ export class EditTreeTestPage {
         this.cancelButton = page.getByRole('button', { name: 'Cancel' });
         this.taskTable = page.locator('#tasks');
         this.addChildNode = page.locator('#createNewNode');
-        this.addRootNode = page.locator('#createNewRoot');
+        this.addRootNode = page.locator('#createNewRootNode');
         this.expandTableNodes = page.locator('#expandAll');
         this.nodeTree = page.locator('#tree')
     }
@@ -54,9 +54,9 @@ export class EditTreeTestPage {
     }
 
     async expandTableAndAddNodes() {
-        this.expandTableNodes.click();
-        this.addRootNode.click();
-        this.nodeTree.locator('a:has-text("Fruits")').click();
-        this.addChildNode.click();
+        await this.expandTableNodes.click();
+        await this.addRootNode.click();
+        await this.nodeTree.locator('a:has-text("Fruits")').click();
+        await this.addChildNode.click();
     }
 }
