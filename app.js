@@ -50,7 +50,7 @@ var limiter = rateLimit({
   max: 120
 });
 // apply rate limiter to all requests
-app.use(limiter);
+// app.use(limiter);
 
 require('pkginfo')(module, 'version');
 logger.info("Kort version: " + module.exports.version);

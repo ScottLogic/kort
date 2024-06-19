@@ -11,8 +11,8 @@ export class EditTreeTestPage {
         this.newTaskButton = page.locator('#newTask');
         this.selectableParentsCheckbox = page.locator("[name='selectableParents']");
         this.showSiblingsCheckbox = page.locator("[name='showSiblings']");
-        this.acceptResponses = this.page.locator('radio', { hasText: 'Accepting Responses' });
-        this.notAcceptingResponses = this.page.locator('radio', { hasText: 'Not accepting Responses' });
+        this.acceptResponses = page.getByText('Accepting responses', { exact: true });
+        this.notAcceptingResponses = page.getByText('Not accepting responses', { exact: true });
         this.submitButton = page.locator('#submitBtn');
         this.cancelButton = page.getByRole('button', { name: 'Cancel' });
         this.taskTable = page.locator('#tasks');
