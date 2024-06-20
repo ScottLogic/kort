@@ -20,6 +20,9 @@ export class EditTreeTestPage {
         this.addRootNode = page.locator('#createNewRootNode');
         this.expandTableNodes = page.locator('#expandAll');
         this.nodeTree = page.locator('#tree');
+        this.uniqueParticipantLink = page.getByText('Unique link for each participant', {exact : true})
+        this.addNameForUniqueParticipant = page.getByPlaceholder('Enter participant identifier (name, id, etc.)');
+        this.addUniqueParticipantButton = page.locator('#addResponseBtn');
     }
 
     async fillLastRow(questionString) {
@@ -58,5 +61,10 @@ export class EditTreeTestPage {
         await this.addRootNode.click();
         await this.nodeTree.locator('a:has-text("Fruits")').click();
         await this.addChildNode.click();
+    }
+
+    async copyUniqueLink(participantName) {
+        this.row = this.taskTable.locator('td:has-text(\"'+participantName+'\")');
+        this.uniqueLink = this.row.locator('a:has-text("localhost")').textContent();
     }
 }
