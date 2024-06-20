@@ -35,7 +35,7 @@ export class StudiesPage {
         await this.fr.getByText('Edit').click(); 
     }
 
-    async clickPreviewButton() {
+    async clickPreviewButtonForFirstTableRow() {
         this.studiesTableBody = this.studiesTable.locator('#studies_table_body');
         this.fr = this.studiesTableBody.locator('.highlight-first-row');
         await this.fr.getByText('Preview').click(); 

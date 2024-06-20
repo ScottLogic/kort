@@ -19,7 +19,7 @@ export class EditTreeTestPage {
         this.addChildNode = page.locator('#createNewNode');
         this.addRootNode = page.locator('#createNewRootNode');
         this.expandTableNodes = page.locator('#expandAll');
-        this.nodeTree = page.locator('#tree')
+        this.nodeTree = page.locator('#tree');
     }
 
     async fillLastRow(questionString) {
