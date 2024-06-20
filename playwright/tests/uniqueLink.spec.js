@@ -14,7 +14,11 @@ test('Unique link test', async ({studiesPage, editTreeTestPage, page, previewPag
     await editTreeTestPage.addNameForUniqueParticipant.fill('Name');
     await editTreeTestPage.addUniqueParticipantButton.click();
     await editTreeTestPage.copyUniqueLink('Name');
-    await page.goto('\"'+editTreeTestPage.uniqueLink+'\")');
+
+    //Taking the unique URL from the page, and passing it to the preview page
+    var uniqueUrl = await editTreeTestPage.uniqueLink;
+    await previewPage.goto(uniqueUrl);
+    
     // await studiesPage.clickPreviewButtonForFirstTableRow();
     // await expect(previewPage.header).toContainText('Default Tree Test Title');
     // await expect(previewPage.taskNum).toContainText('Task 1 of 2');

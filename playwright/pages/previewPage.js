@@ -15,7 +15,10 @@ export class PreviewPage {
         this.nodeTree = page.locator('#tree');
         this.modalConfirmButton = page.getByRole('button', { name: 'Yes, Continue' });
         this.modalConfirmGiveUpButton = page.getByRole('button', { name: 'Yes, Give Up' });
-        
+    }
+
+    async goto(url) {
+        await this.page.goto(url);
     }
 
     async selectApple() {
