@@ -28,5 +28,19 @@ export class PreviewPage {
         await this.nodeTree.locator('a:has-text("Bacon")').click();
     }
 
+    async nextConfirm() {
+        await this.nextButton.click();
+        await this.modalConfirmButton.click();
+    }
+
+    async giveUpConfirm() {
+        await this.giveUpButton.click();
+        await this.modalConfirmGiveUpButton.click();
+    }
+
+    async finishConfirm() {
+        await this.finishButton.click();
+        await this.modalConfirmButton.click();
+    }
 
 }
