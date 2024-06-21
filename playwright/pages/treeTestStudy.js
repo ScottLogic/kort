@@ -1,4 +1,4 @@
-export class PreviewPage {
+export class TreeTestStudy {
 
     /**
     * @param {import('@playwright/test').Page} page
@@ -15,7 +15,11 @@ export class PreviewPage {
         this.nodeTree = page.locator('#tree');
         this.modalConfirmButton = page.getByRole('button', { name: 'Yes, Continue' });
         this.modalConfirmGiveUpButton = page.getByRole('button', { name: 'Yes, Give Up' });
-        
+        this.thankYouMessage = this.page.locator('h1', { hasText: 'Thank you.' });
+    }
+
+    async goto(url) {
+        await this.page.goto(url);
     }
 
     async selectApple() {

@@ -3,7 +3,6 @@ export class EditTreeTestPage {
     /**
     * @param {import('@playwright/test').Page} page
     */
-
     constructor(page) {
         this.page = page;
         this.header = this.page.locator('h1', { hasText: 'Edit Tree Test' });
@@ -20,6 +19,10 @@ export class EditTreeTestPage {
         this.addRootNode = page.locator('#createNewRootNode');
         this.expandTableNodes = page.locator('#expandAll');
         this.nodeTree = page.locator('#tree');
+        this.uniqueParticipantLink = page.getByText('Unique link for each participant', {exact : true});
+        this.addNameForUniqueParticipant = page.getByPlaceholder('Enter participant identifier (name, id, etc.)');
+        this.addUniqueParticipantButton = page.locator('#addResponseBtn');
+        this.responsesTable = page.locator('#responses_table_body');
     }
 
     async fillLastRow(questionString) {
@@ -58,5 +61,10 @@ export class EditTreeTestPage {
         await this.addRootNode.click();
         await this.nodeTree.locator('a:has-text("Fruits")').click();
         await this.addChildNode.click();
+    }
+
+    async copyUniqueLink(participantName) {
+        this.row = this.responsesTable.locator('td:has-text(\"'+participantName+'\")').locator('..');
+        this.uniqueLink = this.row.locator('a:has-text("treetest")').textContent();
     }
 }

@@ -7,7 +7,7 @@ export class StudiesPage {
         this.page = page;
         this.header = this.page.locator('h1', { hasText: 'Studies' });
         this.newStudiesButton = this.page.locator('#newstudy');
-        this.studiesTable = this.page.locator('#studies_table')
+        this.studiesTable = this.page.locator('#studies_table');
     }
 
     async goto() {
@@ -21,7 +21,7 @@ export class StudiesPage {
     }
 
     async firstRow() {
-        this.fr = this.studiesTable.locator('.odd highlight-first-row')
+        this.fr = this.studiesTable.locator('.odd highlight-first-row');
     }
 
     async namedRow(rowName) {
