@@ -5,13 +5,13 @@ test.beforeEach('Navigation to studies', async ({loginPage, studiesPage}) => {
     await loginPage.login('admin','admin');
     await studiesPage.goto();
 });
- 
+
 //This test may need a rework as title name is not dynamic and if ran several times it kicks off due to the same names
-test('Edit tree test title and confirm changes are saved', async ({studiesPage, editTreeTestPage, randomName}) => {
+test('Edit tree test title and confirm changes are saved', async ({studiesPage, editTreeTestPage}) => {
     await studiesPage.clickNewStudy();
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
-    await editTreeTestPage.editTestTitle(randomName);
+    await editTreeTestPage.editTestTitle('Changed Title 4');
 
     await expect(studiesPage.header).toContainText('Studies');
     await studiesPage.namedRow('Changed Title 4')
