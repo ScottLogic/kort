@@ -1,12 +1,12 @@
-const { test, expect} = require('../fixtures/pageFixtures');
+const { test, expect } = require('../fixtures/pageFixtures');
 
-test.beforeEach('Navigation to studies', async ({loginPage, studiesPage}) => {
+test.beforeEach('Navigation to studies', async ({ loginPage, studiesPage }) => {
     await loginPage.goto();
     await loginPage.login();
     await studiesPage.goto();
 });
 
-test('Unique link test', async ({studiesPage, editTreeTestPage, previewPage}) => {
+test('Unique link test', async ({ studiesPage, editTreeTestPage, treeTestStudy }) => {
     //Sets up unique link
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
@@ -21,17 +21,17 @@ test('Unique link test', async ({studiesPage, editTreeTestPage, previewPage}) =>
 
     //Taking the unique URL from the page, and passing it to the preview page
     var uniqueUrl = await editTreeTestPage.uniqueLink;
-    await previewPage.goto(uniqueUrl);
-    
+    await treeTestStudy.goto(uniqueUrl);
+
     //Runs through tree test for unique link
-    await expect(previewPage.header).toContainText('Default Tree Test Title');
-    await expect(previewPage.taskNum).toContainText('Task 1 of 2');
-    await expect(previewPage.taskQuestion).toContainText('Where is the Apples?');
-    await previewPage.selectApple();
-    await previewPage.nextConfirm();
-    await expect(previewPage.taskNum).toContainText('Task 2 of 2');
-    await expect(previewPage.taskQuestion).toContainText('Where is the Bacon?');
-    await previewPage.selectBacon();
-    await previewPage.finishConfirm();
-    await expect(previewPage.thankYouMessage).toContainText('Thank you.');
+    await expect(treeTestStudy.header).toContainText('Default Tree Test Title');
+    await expect(treeTestStudy.taskNum).toContainText('Task 1 of 2');
+    await expect(treeTestStudy.taskQuestion).toContainText('Where is the Apples?');
+    await treeTestStudy.selectApple();
+    await treeTestStudy.nextConfirm();
+    await expect(treeTestStudy.taskNum).toContainText('Task 2 of 2');
+    await expect(treeTestStudy.taskQuestion).toContainText('Where is the Bacon?');
+    await treeTestStudy.selectBacon();
+    await treeTestStudy.finishConfirm();
+    await expect(treeTestStudy.thankYouMessage).toContainText('Thank you.');
 });

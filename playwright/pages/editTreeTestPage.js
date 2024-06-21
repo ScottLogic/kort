@@ -65,6 +65,6 @@ export class EditTreeTestPage {
 
     async copyUniqueLink(participantName) {
         this.row = this.responsesTable.locator('td:has-text(\"'+participantName+'\")').locator('..');
-        this.uniqueLink = this.row.locator('a:has-text("localhost")').textContent();
+        this.uniqueLink = this.row.locator('a:has-text("treetest")').textContent();
     }
 }

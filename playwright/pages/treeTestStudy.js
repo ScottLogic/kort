@@ -1,4 +1,4 @@
-export class PreviewPage {
+export class TreeTestStudy {
 
     /**
     * @param {import('@playwright/test').Page} page

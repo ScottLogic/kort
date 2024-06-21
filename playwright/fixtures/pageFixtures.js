@@ -4,7 +4,7 @@ const { OverviewPage } = require ('../pages/overviewPage');
 const { StudiesPage } = require('../pages/studiesPage');
 const { EditTreeTestPage } = require('../pages/editTreeTestPage');
 const { UsersPage } = require('../pages/usersPage');
-const { PreviewPage } = require('../pages/previewPage');
+const { TreeTestStudy } = require('../pages/treeTestStudy');
 
 exports.test = base.test.extend({
     loginPage: async ({ page }, use) => {
@@ -32,9 +32,9 @@ exports.test = base.test.extend({
         await use(usersPage);
     },
 
-    previewPage: async ({ page }, use) => {
-        const previewPage = new PreviewPage(page);
-        await use(previewPage);
+    treeTestStudy: async ({ page }, use) => {
+        const treeTestStudy = new TreeTestStudy(page);
+        await use(treeTestStudy);
     },
 
 });
