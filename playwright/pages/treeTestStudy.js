@@ -1,3 +1,5 @@
+import { forEach } from 'async';
+
 export class TreeTestStudy {
 
     /**
@@ -22,14 +24,10 @@ export class TreeTestStudy {
         await this.page.goto(url);
     }
 
-    async selectApple() {
-        await this.nodeTree.locator('a:has-text("Fruits")').click();
-        await this.nodeTree.locator('a:has-text("Apple")').click();
-    }
-
-    async selectBacon() {
-        await this.nodeTree.locator('a:has-text("Meats")').click();
-        await this.nodeTree.locator('a:has-text("Bacon")').click();
+    async selectNode(...path) {
+        for (const node of path) {
+            await this.nodeTree.locator('a:has-text("'+node+'")').click();
+        }
     }
 
     async nextConfirm() {

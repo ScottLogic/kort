@@ -16,9 +16,9 @@ export class LoginPage {
         await this.page.goto('http://localhost:3000/');
     }
 
-    async login() {
-        await this.username.fill('admin');
-        await this.password.fill('admin');
+    async login(username, password) {
+        await this.username.fill(username);
+        await this.password.fill(password);
         await this.loginButton.click();
     }
 

@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures/pageFixtures.js';
 
 test.beforeEach('Login', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login();
+    await loginPage.login('admin','admin');
 });
 
 test('overview title', async ({ overviewPage }) => {
