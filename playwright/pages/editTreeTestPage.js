@@ -40,8 +40,8 @@ export class EditTreeTestPage {
         await row.locator('a:has-text("Remove")').click();
     }
 
-    async clickAddAnswerButton(rowQuestion) {
-        this.emptyRow = this.taskTable.locator(rowQuestion).last().locator('../..');
+    async clickAddAnswerButton() {
+        this.emptyRow = this.taskTable.locator('textarea').last().locator('../..');
         await this.emptyRow.locator('#newAnswer').click();
     }
 
@@ -62,7 +62,7 @@ export class EditTreeTestPage {
         return this.row.locator('a:has-text("treetest")').textContent();
     }
 
-    async editTestTitle(title) {    
+    async changeTestTitle(title) {    
         await this.editTestTitle.clear();
         await this.editTestTitle.fill(title);
         await this.submitButton.click();

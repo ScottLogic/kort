@@ -22,7 +22,7 @@ test('Add and remove a new user', async ({ overviewPage, usersPage, loginPage })
     await expect(overviewPage.header).toHaveText('Overview');
     await usersPage.logout.click();
 
-    await loginPage.login();
+    await loginPage.login('admin','admin');
     await overviewPage.users.click();
     await usersPage.deleteUser('user');
 });
