@@ -15,6 +15,7 @@ export class PreviewPage {
         this.nodeTree = page.locator('#tree');
         this.modalConfirmButton = page.getByRole('button', { name: 'Yes, Continue' });
         this.modalConfirmGiveUpButton = page.getByRole('button', { name: 'Yes, Give Up' });
+        this.thankYouMessage = this.page.locator('h1', { hasText: 'Thank you.' });
     }
 
     async goto(url) {
