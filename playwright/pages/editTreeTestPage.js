@@ -13,13 +13,12 @@ export class EditTreeTestPage {
         this.acceptResponses = page.getByText('Accepting responses', { exact: true });
         this.notAcceptingResponses = page.getByText('Not accepting responses', { exact: true });
         this.submitButton = page.locator('#submitBtn');
-        this.cancelButton = page.getByRole('button', { name: 'Cancel' });
         this.taskTable = page.locator('#tasks');
         this.addChildNode = page.locator('#createNewNode');
         this.addRootNode = page.locator('#createNewRootNode');
         this.expandTableNodes = page.locator('#expandAll');
         this.nodeTree = page.locator('#tree');
-        this.uniqueParticipantLink = page.getByText('Unique link for each participant', {exact : true});
+        this.uniqueParticipantLinkRadioButton = page.getByText('Unique link for each participant', {exact : true});
         this.addNameForUniqueParticipant = page.getByPlaceholder('Enter participant identifier (name, id, etc.)');
         this.addUniqueParticipantButton = page.locator('#addResponseBtn');
         this.responsesTable = page.locator('#responses_table_body');
@@ -31,11 +30,6 @@ export class EditTreeTestPage {
         this.emptyRow.fill(questionString);
     }
 
-    async questionAnswers(rowQuestion) {
-        const row = this.taskTable.locator('tr:has-text(\"'+rowQuestion+'\")');
-        this.expectedAnswer.this.row('#expected-answers');
-    }
-
     async deleteQuestions(rowQuestion) {
         const row = this.taskTable.locator('tr:has-text(\"'+rowQuestion+'\")');
         await row.getByRole('button', { name: 'deletetask' });
@@ -43,16 +37,16 @@ export class EditTreeTestPage {
 
     async deleteAnswer(rowQuestion) {
         const row = this.taskTable.locator('tr:has-text(\"'+rowQuestion+'\")');
-        await this.row.locator('a:has-text("Remove")').click();
+        await row.locator('a:has-text("Remove")').click();
     }
 
-    async addAnswer(rowQuestion) {
-        this.emptyRow = await this.taskTable.locator('textarea').last().locator('../..');
+    async clickAddAnswerButton() {
+        this.emptyRow = this.taskTable.locator('textarea').last().locator('../..');
         await this.emptyRow.locator('#newAnswer').click();
     }
 
     async answerText(rowQuestion) {
-        this.emptyRow = await this.taskTable.locator('textarea').last().locator('../..');
+        this.emptyRow = this.taskTable.locator(rowQuestion).last().locator('../..');
         this.newAnswer = this.emptyRow.locator('p:has-text("false")');
     }
 
@@ -65,6 +59,18 @@ export class EditTreeTestPage {
 
     async copyUniqueLink(participantName) {
         this.row = this.responsesTable.locator('td:has-text(\"'+participantName+'\")').locator('..');
-        this.uniqueLink = this.row.locator('a:has-text("treetest")').textContent();
+        return this.row.locator('a:has-text("treetest")').textContent();
+    }
+
+    async changeTestTitle(title) {    
+        await this.editTestTitle.clear();
+        await this.editTestTitle.fill(title);
+        await this.submitButton.click();
+    }
+    async addParticipantName(name) {
+        await this.addNameForUniqueParticipant.isVisible();
+        await this.addNameForUniqueParticipant.clear();
+        await this.addNameForUniqueParticipant.fill(name);
+        await this.addUniqueParticipantButton.click();
     }
 }

@@ -24,28 +24,27 @@ export class StudiesPage {
         this.fr = this.studiesTable.locator('.odd highlight-first-row');
     }
 
+    //Review if needed - leaving for now due to potential tests
     async namedRow(rowName) {
         const row = this.page.locator('tr:has-text(\"'+rowName+'\")');
         await row.locator('a:has-text("Edit")').click();    
     }
 
     async clickEditButtonForFirstTableRow() {
-        this.studiesTableBody = this.studiesTable.locator('#studies_table_body');
-        this.fr = this.studiesTableBody.locator('.highlight-first-row');
-        await this.fr.getByText('Edit').click(); 
+        this.clickStudyRowButton('Edit');    
     }
 
     async clickPreviewButtonForFirstTableRow() {
-        this.studiesTableBody = this.studiesTable.locator('#studies_table_body');
-        this.fr = this.studiesTableBody.locator('.highlight-first-row');
-        await this.fr.getByText('Preview').click(); 
-
+        this.clickStudyRowButton('Preview');    
     }
 
     async clickResultsButton() {
+        this.clickStudyRowButton('Results');    
+    }
+
+    async clickStudyRowButton(button) {
         this.studiesTableBody = this.studiesTable.locator('#studies_table_body');
         this.fr = this.studiesTableBody.locator('.highlight-first-row');
-        await this.fr.getByText('Results').click(); 
-
+        await this.fr.getByText(button).click(); 
     }
 }

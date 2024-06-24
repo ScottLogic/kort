@@ -2,7 +2,7 @@ const { test, expect} = require('../fixtures/pageFixtures');
 
 test.beforeEach('Navigation to studies', async ({loginPage, studiesPage}) => {
     await loginPage.goto();
-    await loginPage.login();
+    await loginPage.login('admin','admin');
     await studiesPage.goto();
 });
 
@@ -11,9 +11,8 @@ test('Edit tree test title and confirm changes are saved', async ({studiesPage, 
     await studiesPage.clickNewStudy();
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
-    await editTreeTestPage.editTestTitle.clear();
-    await editTreeTestPage.editTestTitle.fill('Changed Title 4');
-    await editTreeTestPage.submitButton.click();
+    await editTreeTestPage.changeTestTitle('Changed Title 4');
+
     await expect(studiesPage.header).toContainText('Studies');
     await studiesPage.namedRow('Changed Title 4')
     await expect(editTreeTestPage.editTestTitle).toHaveValue('Changed Title 4');
@@ -43,7 +42,7 @@ test('Find LastRow', async ({studiesPage, editTreeTestPage}) => {
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
     await editTreeTestPage.fillLastRow('I am a string');
-    await editTreeTestPage.addAnswer('I am a string');
+    await editTreeTestPage.clickAddAnswerButton();
     await editTreeTestPage.answerText('I am a string')
     await expect(editTreeTestPage.newAnswer).toContainText('false');
     await editTreeTestPage.submitButton.click();

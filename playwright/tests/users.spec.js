@@ -2,7 +2,7 @@ import { test, expect } from '../fixtures/pageFixtures.js';
 
 test.beforeEach('Login', async ({ loginPage }) => {
     await loginPage.goto();
-    await loginPage.login();
+    await loginPage.login('admin','admin');
 });
 
 test('overview title', async ({ overviewPage }) => {
@@ -22,7 +22,7 @@ test('Add and remove a new user', async ({ overviewPage, usersPage, loginPage })
     await expect(overviewPage.header).toHaveText('Overview');
     await usersPage.logout.click();
 
-    await loginPage.login();
+    await loginPage.login('admin','admin');
     await overviewPage.users.click();
     await usersPage.deleteUser('user');
 });
