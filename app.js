@@ -8,9 +8,6 @@ if (process.env.mongoHost){
     //if we're launched from Docker
     mongoURL = 'mongodb://'+process.env.mongoHost+':27017/kort';
 }
-//the admin user is created upon launching the application for the first time
-const adminUser = "admin";  //optionally change this
-const adminPassword = "admin"; //set this to something different and secure
 
 const allowGoogleAuth = false; //allowUserRegistration must be set to true as well to enable this
 const allowUserRegistration = false;
@@ -43,13 +40,13 @@ const flash = require('connect-flash');
 var logger = require('./server/logger.js');
 const path = require('path');
 
-// set up rate limiter: maximum of 500 requests per 10 seconds
+// set up rate limiter: maximum of 120 requests per 10 seconds
 var rateLimit = require('express-rate-limit');
 var limiter = rateLimit({
   windowMs: 1*10*1000, // 10 seconds
-  max: 500, // limit each IP to 500 requests per windowMs
+  max: 120
 });
-//apply rate limiter to all requests
+// apply rate limiter to all requests
 app.use(limiter);
 
 require('pkginfo')(module, 'version');
@@ -75,8 +72,12 @@ require('./models/study');
 require('./models/upload');
 require('./models/event');
 
+require('dotenv').config();
 //setup a default admin account in Mongo
-require('./server/createadmin_user')(adminUser, adminPassword);
+const adminUser = process.env.ADMIN_USER;
+const adminPassword = process.env.ADMIN_PASSWORD;
+//setup a default admin account in Mongo
+require('./server/createadmin_user')(adminUser, adminPassword); 
 
 app.set('view engine', 'ejs');
 
