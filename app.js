@@ -4,9 +4,9 @@ const port = process.env.PORT || 3000;
 //https://docs.mongodb.com/manual/reference/connection-string/
 //with a username and password: 'mongodb://kort:123@127.0.0.1/kort'
 var mongoURL = 'mongodb://127.0.0.1:27017/kort';
-if (process.env.mongoHost){
+if (process.env.MONGO_HOST){
     //if we're launched from Docker
-    mongoURL = 'mongodb://'+process.env.mongoHost+':27017/kort';
+    mongoURL = 'mongodb://'+process.env.MONGO_HOST+':27017/kort';
 }
 
 //load in environment variables
