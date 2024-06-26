@@ -26,25 +26,32 @@ export class StudiesPage {
 
     //Review if needed - leaving for now due to potential tests
     async namedRow(rowName) {
-        const row = this.page.locator('tr:has-text(\"'+rowName+'\")');
+        const row = this.page.locator('td:has-text(\"'+rowName+'\")').locator('..');
         await row.locator('a:has-text("Edit")').click();    
     }
 
-    async clickEditButtonForFirstTableRow() {
-        this.clickStudyRowButton('Edit');    
+    async clickEditButtonForFirstTableRow(rowName = null) {
+        this.clickStudyRowButton('Edit', rowName);  
     }
 
-    async clickPreviewButtonForFirstTableRow() {
-        this.clickStudyRowButton('Preview');    
+    async clickPreviewButtonForFirstTableRow(rowName = null) {
+        this.clickStudyRowButton('Preview', rowName);    
     }
 
-    async clickResultsButton() {
-        this.clickStudyRowButton('Results');    
+    async clickResultsButtonForFirstTableRow(rowName = null) {
+        this.clickStudyRowButton('Results', rowName);    
     }
 
-    async clickStudyRowButton(button) {
+    async clickStudyRowButton(button, rowName) {
         this.studiesTableBody = this.studiesTable.locator('#studies_table_body');
-        this.fr = this.studiesTableBody.locator('.highlight-first-row');
+        if (rowName == null)
+        {
+            this.fr = this.studiesTableBody.locator('.highlight-first-row');  
+        }
+        else
+        {
+            this.fr = this.studiesTableBody.locator('td:has-text(\"'+rowName+'\")').locator('..');
+        }
         await this.fr.getByText(button).click(); 
     }
 }
