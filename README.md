@@ -25,11 +25,11 @@
 
 A web application supporting multiple user experience (UX) research methods.
 
-- [Card Sorting](https://en.wikipedia.org/wiki/Card_sorting)
-- [Tree Testing](https://en.wikipedia.org/wiki/Tree_testing)
-- [Product Reaction Cards](https://en.wikipedia.org/wiki/Microsoft_Reaction_Card_Method_%28Desirability_Testing%29)
-- [System Usability Scale (SUS)](https://en.wikipedia.org/wiki/System_usability_scale)
-- [Net Promoter Score (NPS)](https://www.netpromoter.com/know/)
+* [Card Sorting](https://en.wikipedia.org/wiki/Card_sorting)
+* [Tree Testing](https://en.wikipedia.org/wiki/Tree_testing)
+* [Product Reaction Cards](https://en.wikipedia.org/wiki/Microsoft_Reaction_Card_Method_%28Desirability_Testing%29)
+* [System Usability Scale (SUS)](https://en.wikipedia.org/wiki/System_usability_scale)
+* [Net Promoter Score (NPS)](https://www.netpromoter.com/know/)
 
 See the [website](https://carlsonp.github.io/kort/) for more information.
 
@@ -49,63 +49,63 @@ See the [website](https://carlsonp.github.io/kort/) for more information.
 
 1. Use one of the following:
 
-   1. Use [Git](https://git-scm.com/) to clone the code (`git clone https://github.com/carlsonp/kort.git`)
-   2. [Download a release archive](https://github.com/carlsonp/kort/releases) from Github
-   3. Install from the published [npm package](https://www.npmjs.com/package/@carlsonp/kort) via `npm install @carlsonp/kort`
+    1. Use [Git](https://git-scm.com/) to clone the code (`git clone https://github.com/carlsonp/kort.git`)
+    2. [Download a release archive](https://github.com/carlsonp/kort/releases) from Github
+    3. Install from the published [npm package](https://www.npmjs.com/package/@carlsonp/kort) via `npm install @carlsonp/kort`
 
 2. Edit `app.js` and optionally set the `adminUser` and set your own username.
 
 3. Edit the `adminPassword` value in `app.js`.
 
-4. Optionally set `allowUserRegistration` in `app.js` to allow users to register. Otherwise users can only be created by accounts with 'admin' access.
+4. Optionally set `allowUserRegistration` in `app.js` to allow users to register.  Otherwise users can only be created by accounts with 'admin' access.
 
-5. Optionally setup Google authentication. [See the wiki for details](https://github.com/carlsonp/kort/wiki/Setting-up-Google-Authentication).
+5. Optionally setup Google authentication.  [See the wiki for details](https://github.com/carlsonp/kort/wiki/Setting-up-Google-Authentication).
 
 6. Continue installation [via source](#ViaSource) or
-   [via Docker](#ViaDocker).
+[via Docker](#ViaDocker).
 
 <a name="ViaSource"/>
 
 ### Via Source
 
-1.  Install [Node.js](https://nodejs.org)
+1. Install [Node.js](https://nodejs.org)
 
-2.  Install [MongoDB](https://www.mongodb.com/) (3.0 or higher) or provide a connection to an existing server
-    by editing the `app.js` file and setting the `mongoURL`. Kort uses the Mongoose package. To optionally [secure your MongoDB with a username
-    and password](https://stackoverflow.com/questions/4881208/how-to-secure-mongodb-with-username-and-password/19768877),
-    create a user for the `kort` database by doing the following:
+2. Install [MongoDB](https://www.mongodb.com/) (3.0 or higher) or provide a connection to an existing server
+by editing the `app.js` file and setting the `mongoURL`.  Kort uses the Mongoose package. To optionally [secure your MongoDB with a username
+and password](https://stackoverflow.com/questions/4881208/how-to-secure-mongodb-with-username-and-password/19768877),
+create a user for the `kort` database by doing the following:
 
-        Open a Mongo commandline shell:
+    Open a Mongo commandline shell:
 
-        ```shell
-        mongo --port 27017
-        ```
+    ```shell
+    mongo --port 27017
+    ```
 
-        Select the database:
+    Select the database:
 
-        ```mongo
-        use kort
-        ```
+    ```mongo
+    use kort
+    ```
 
-        Create the new user:
+    Create the new user:
 
-        ```mongo
-        db.createUser(
-           {
-             user: "kort",
-             pwd: "123",
-            roles: [ { role: "readWrite", db: "kort" } ]
-           }
-        )
-        ```
+    ```mongo
+    db.createUser(
+       {
+         user: "kort",
+         pwd: "123",
+        roles: [ { role: "readWrite", db: "kort" } ]
+       }
+    )
+    ```
 
-        Then edit `/etc/mongodb.conf` and enable `auth=true`.  Restart the service.  Make sure to set
-        the `mongoURL` with the appropriate username and password.
+    Then edit `/etc/mongodb.conf` and enable `auth=true`.  Restart the service.  Make sure to set
+    the `mongoURL` with the appropriate username and password.
 
-3.  Run `npm install` on the commandline. This will install the dependencies into the `node_modules` folder.
+3. Run `npm install` on the commandline.  This will install the dependencies into the `node_modules` folder.
 
-4.  Run `node app.js` from the main directory. This will start the NodeJS server
-    on the default port 3000.
+4. Run `node app.js` from the main directory.  This will start the NodeJS server
+on the default port 3000.
 
 <a name="ViaDocker"/>
 
@@ -117,21 +117,21 @@ See the [website](https://carlsonp.github.io/kort/) for more information.
 
 3. Build the containers
 
-   ```shell
-   docker-compose build
-   ```
+    ```shell
+    docker-compose build
+    ```
 
 4. Start the containers (use -d to run in detached mode)
 
-   ```shell
-   docker-compose up
-   ```
+    ```shell
+    docker-compose up
+    ```
 
 5. Stop the containers (when using detached mode)
 
-   ```shell
-   docker-compose down
-   ```
+    ```shell
+    docker-compose down
+    ```
 
 Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` folder.
 
@@ -141,7 +141,7 @@ Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` f
 
 1. You can connect via [http://localhost:3000](http://localhost:3000)
 
-2. The `adminUser` and `adminPassword` that is set in `app.js` needs to be declared in a .env file.
+2. The `adminUser` and `adminPassword` that is set in `app.js` is the username and password for the account that will be created upon first launch. You can set the variables in `.env` or set in `docker-compose.yml`. **NB: If defined using both the environment vairables with have precedence.**
 
 <a name="Support"/>
 

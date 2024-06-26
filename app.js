@@ -9,6 +9,19 @@ if (process.env.mongoHost){
     mongoURL = 'mongodb://'+process.env.mongoHost+':27017/kort';
 }
 
+//load in environment variables
+require('dotenv').config();
+
+//default admin user and password
+var adminUser = 'admin';
+var adminPassword = 'admin';
+if(process.env.adminUser && process.env.adminPassword){
+    adminUser = process.env.adminUser;
+    adminPassword = process.env.adminPassword;
+} else {
+    console.error("No admin user and/or password set, using default admin/admin");
+}
+
 const allowGoogleAuth = false; //allowUserRegistration must be set to true as well to enable this
 const allowUserRegistration = false;
 
@@ -72,10 +85,6 @@ require('./models/study');
 require('./models/upload');
 require('./models/event');
 
-require('dotenv').config();
-//setup a default admin account in Mongo
-const adminUser = process.env.ADMIN_USER;
-const adminPassword = process.env.ADMIN_PASSWORD;
 //setup a default admin account in Mongo
 require('./server/createadmin_user')(adminUser, adminPassword); 
 
