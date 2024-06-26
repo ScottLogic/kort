@@ -13,13 +13,12 @@ if (process.env.mongoHost){
 require('dotenv').config();
 
 //default admin user and password
-var adminUser = 'admin';
-var adminPassword = 'admin';
-if(process.env.adminUser && process.env.adminPassword){
-    adminUser = process.env.adminUser;
-    adminPassword = process.env.adminPassword;
-} else {
-    console.error("No admin user and/or password set, using default admin/admin");
+const DEFAULT_ADMIN_USER = 'admin';
+const DEFAULT_ADMIN_PASSWORD = 'admin';
+const adminUser = process.env.ADMIN_USER || DEFAULT_ADMIN_USER;
+const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+if (adminUser === DEFAULT_ADMIN_USER && adminPassword === DEFAULT_ADMIN_PASSWORD) {
+    console.warn("No admin user and/or password set, using default admin/admin");
 }
 
 const allowGoogleAuth = false; //allowUserRegistration must be set to true as well to enable this

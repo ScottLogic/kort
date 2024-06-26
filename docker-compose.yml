@@ -11,9 +11,6 @@ services:
     links:
       - mongo
     # https://stackoverflow.com/questions/40873165/use-docker-run-command-to-pass-arguments-to-cmd-in-dockerfile
-    environment:
-      - mongoHost=mongo
-      # Set admin and admin password for the app here if you want to use environment variables
     # https://docs.docker.com/compose/compose-file/#healthcheck
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]

@@ -141,7 +141,7 @@ Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` f
 
 1. You can connect via [http://localhost:3000](http://localhost:3000)
 
-2. The `adminUser` and `adminPassword` that is set in `app.js` is the username and password for the account that will be created upon first launch. You can set the variables in `.env` or set in `docker-compose.yml`. **NB: If defined using both the environment vairables with have precedence.**
+2. The `adminUser` and `adminPassword` variables in `app.js` is the username and password for the account that will be created upon first launch. You can set these variables in the `.env` file or directly in the `docker-compose.yml` file. If you choose to set them as environment variables, make sure to remove the reference to `.env` in `docker-compose.yml`. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
 
 <a name="Support"/>
 
