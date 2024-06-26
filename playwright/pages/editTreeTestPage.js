@@ -46,7 +46,7 @@ export class EditTreeTestPage {
     }
 
     async answerText(rowQuestion) {
-        this.emptyRow = this.taskTable.locator(rowQuestion).last().locator('../..');
+        this.emptyRow = this.taskTable.locator('textarea:has-text(\"'+rowQuestion+'\")').locator('../..');
         this.newAnswer = this.emptyRow.locator('p:has-text("false")');
     }
 

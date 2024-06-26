@@ -19,13 +19,16 @@ test('Edit tree test title and confirm changes are saved', async ({studiesPage, 
 });
 
 test('Tree Test Options', async ({studiesPage, editTreeTestPage}) => {
+    await studiesPage.clickNewStudy();
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
+    await editTreeTestPage.changeTestTitle('Tree Test Options Test');
+    await studiesPage.clickEditButtonForFirstTableRow('Tree Test Options Test');
     await editTreeTestPage.selectableParentsCheckbox.click();
     await  editTreeTestPage.showSiblingsCheckbox.click();
     await editTreeTestPage.submitButton.click();
     await expect(studiesPage.header).toContainText('Studies');
-    await studiesPage.clickEditButtonForFirstTableRow();
+    await studiesPage.clickEditButtonForFirstTableRow('Tree Test Options Test');
     await expect(editTreeTestPage.selectableParentsCheckbox).toBeChecked();
     await expect(editTreeTestPage.showSiblingsCheckbox).toBeChecked();
 });
@@ -39,13 +42,19 @@ test('Tree Test Status', async ({studiesPage, editTreeTestPage}) => {
 });
 
 test('Find LastRow', async ({studiesPage, editTreeTestPage}) => {
+    await studiesPage.clickNewStudy();
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
+    await editTreeTestPage.changeTestTitle('Last Row Test');
+    await studiesPage.clickEditButtonForFirstTableRow('Last Row Test');
+    await editTreeTestPage.submitButton.click();
+    await studiesPage.namedRow('Last Row Test');
     await editTreeTestPage.fillLastRow('I am a string');
     await editTreeTestPage.clickAddAnswerButton();
-    await editTreeTestPage.answerText('I am a string')
-    await expect(editTreeTestPage.newAnswer).toContainText('false');
     await editTreeTestPage.submitButton.click();
+    await studiesPage.namedRow('Last Row Test');
+    await editTreeTestPage.answerText('I am a string');
+    await expect(editTreeTestPage.newAnswer).toContainText('false');
 });
 
 test('Confirm tree table adds nodes', async ({studiesPage, editTreeTestPage}) => {
