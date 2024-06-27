@@ -4,13 +4,22 @@ const port = process.env.PORT || 3000;
 //https://docs.mongodb.com/manual/reference/connection-string/
 //with a username and password: 'mongodb://kort:123@127.0.0.1/kort'
 var mongoURL = 'mongodb://127.0.0.1:27017/kort';
-if (process.env.mongoHost){
+if (process.env.MONGO_HOST){
     //if we're launched from Docker
-    mongoURL = 'mongodb://'+process.env.mongoHost+':27017/kort';
+    mongoURL = 'mongodb://'+process.env.MONGO_HOST+':27017/kort';
 }
-//the admin user is created upon launching the application for the first time
-const adminUser = "admin";  //optionally change this
-const adminPassword = "admin"; //set this to something different and secure
+
+//load in environment variables
+require('dotenv').config();
+
+//default admin user and password
+const DEFAULT_ADMIN_USER = 'admin';
+const DEFAULT_ADMIN_PASSWORD = 'admin';
+const adminUser = process.env.ADMIN_USER || DEFAULT_ADMIN_USER;
+const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
+if (adminUser === DEFAULT_ADMIN_USER && adminPassword === DEFAULT_ADMIN_PASSWORD) {
+    console.warn("No admin user and/or password set, using default admin/admin");
+}
 
 const allowGoogleAuth = false; //allowUserRegistration must be set to true as well to enable this
 const allowUserRegistration = false;
@@ -76,7 +85,7 @@ require('./models/upload');
 require('./models/event');
 
 //setup a default admin account in Mongo
-require('./server/createadmin_user')(adminUser, adminPassword);
+require('./server/createadmin_user')(adminUser, adminPassword); 
 
 app.set('view engine', 'ejs');
 

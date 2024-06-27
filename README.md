@@ -115,19 +115,21 @@ on the default port 3000.
 
 2. [Install docker-compose](https://docs.docker.com/compose/install/)
 
-3. Build the containers
+3. Ensure you create a `.env` file in the root of the project directory with the required environment variables (See `example.env`). If you choose to set the environment variables directly, remove any refences to the `.env` file in `docker-compose.yml` to prevent docker compose looking for it at build time.  
+
+4. Build the containers
 
     ```shell
     docker-compose build
     ```
 
-4. Start the containers (use -d to run in detached mode)
+5. Start the containers (use -d to run in detached mode)
 
     ```shell
     docker-compose up
     ```
 
-5. Stop the containers (when using detached mode)
+6. Stop the containers (when using detached mode)
 
     ```shell
     docker-compose down
@@ -141,7 +143,7 @@ Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` f
 
 1. You can connect via [http://localhost:3000](http://localhost:3000)
 
-2. The `adminUser` and `adminPassword` that is set in `app.js` is the username and password for the account that will be created upon first launch.  Use this to login.
+2. The `adminUser` and `adminPassword` variables in `app.js` is the username and password for the account that will be created upon first launch. You can set these variables in the `.env` file or as an environment variables. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
 
 <a name="Support"/>
 

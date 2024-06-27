@@ -11,4 +11,4 @@ RUN npm install --only=production
 COPY . /usr/src/kort
 EXPOSE 3000
 # https://stackoverflow.com/questions/40873165/use-docker-run-command-to-pass-arguments-to-cmd-in-dockerfile
-CMD ["sh", "-c", "node app.js ${mongoHost}"]
+CMD ["sh", "-c", "node app.js ${MONGO_HOST}"]

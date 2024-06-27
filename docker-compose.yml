@@ -11,8 +11,6 @@ services:
     links:
       - mongo
     # https://stackoverflow.com/questions/40873165/use-docker-run-command-to-pass-arguments-to-cmd-in-dockerfile
-    environment:
-      - mongoHost=mongo
     # https://docs.docker.com/compose/compose-file/#healthcheck
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/"]
@@ -20,6 +18,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 3s
+    env_file:
+      - .env
 
   mongo:
     container_name: mongo
