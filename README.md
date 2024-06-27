@@ -115,19 +115,21 @@ on the default port 3000.
 
 2. [Install docker-compose](https://docs.docker.com/compose/install/)
 
-3. Build the containers
+3. Ensure you create a `.env` file in the root of the project directory with the required environment variables (See `example.env`). If you choose to set the environment variables directly, remove any refences to the `.env` file in `docker-compose.yml` to prevent docker compose looking for it at build time.  
+
+4. Build the containers
 
     ```shell
     docker-compose build
     ```
 
-4. Start the containers (use -d to run in detached mode)
+5. Start the containers (use -d to run in detached mode)
 
     ```shell
     docker-compose up
     ```
 
-5. Stop the containers (when using detached mode)
+6. Stop the containers (when using detached mode)
 
     ```shell
     docker-compose down
