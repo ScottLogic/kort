@@ -11,6 +11,7 @@ import { defineConfig, devices } from '@playwright/test';
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
+
   timeout: 1* 60 * 1000,
   testDir: './',
   /* Run tests in files in parallel */
@@ -38,9 +39,15 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      teardown: 'teardown'
+
+    },
+    {
+      name: 'teardown',
+      testMatch: /global-teardown.js/,
     },
 
-  ],
+],
 
   /* Run your local dev server before starting the tests */
   // webServer: {

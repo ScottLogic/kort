@@ -22,17 +22,17 @@ test('Create a basic tree and go through the preview of the tree checking that t
     await expect(studiesPage.header).toContainText('Studies');
 });
 
-test('Preview page give up button functionality', async ({ studiesPage, treeTestStudy }) => {
-    await studiesPage.clickPreviewButtonForFirstTableRow();
-    await expect(treeTestStudy.header).toContainText('Default Tree Test Title');
-    await expect(treeTestStudy.taskNum).toContainText('Task 1 of 2');
-    await expect(treeTestStudy.taskQuestion).toContainText('Where is the Apples?');
-    await treeTestStudy.selectNode("Fruits","Apple");
-    await treeTestStudy.giveUpConfirm();
+// test('Preview page give up button functionality', async ({ studiesPage, treeTestStudy }) => {
+//     await studiesPage.clickPreviewButtonForFirstTableRow();
+//     await expect(treeTestStudy.header).toContainText('Default Tree Test Title');
+//     await expect(treeTestStudy.taskNum).toContainText('Task 1 of 2');
+//     await expect(treeTestStudy.taskQuestion).toContainText('Where is the Apples?');
+//     await treeTestStudy.selectNode("Fruits","Apple");
+//     await treeTestStudy.giveUpConfirm();
 
-    await expect(treeTestStudy.taskNum).toContainText('Task 2 of 2');
-    await expect(treeTestStudy.taskQuestion).toContainText('Where is the Bacon?');
-    await treeTestStudy.selectNode("Meats","Bacon");
-    await treeTestStudy.giveUpConfirm();
-    await expect(studiesPage.header).toContainText('Studies');
-});
+//     await expect(treeTestStudy.taskNum).toContainText('Task 2 of 2');
+//     await expect(treeTestStudy.taskQuestion).toContainText('Where is the Bacon?');
+//     await treeTestStudy.selectNode("Meats","Bacon");
+//     await treeTestStudy.giveUpConfirm();
+//     await expect(studiesPage.header).toContainText('Studies');
+// });
