@@ -11,11 +11,11 @@ test('Edit tree test title and confirm changes are saved', async ({studiesPage, 
     await studiesPage.clickNewStudy();
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
-    await editTreeTestPage.changeTestTitle('Changed Title 4');
+    await editTreeTestPage.changeTestTitle('Changed Title');
 
     await expect(studiesPage.header).toContainText('Studies');
-    await studiesPage.namedRow('Changed Title 4')
-    await expect(editTreeTestPage.editTestTitle).toHaveValue('Changed Title 4');
+    await studiesPage.namedRow('Changed Title')
+    await expect(editTreeTestPage.editTestTitle).toHaveValue('Changed Title');
 });
 
 test('Tree Test Options', async ({studiesPage, editTreeTestPage}) => {

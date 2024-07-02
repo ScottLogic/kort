@@ -67,6 +67,7 @@ export class EditTreeTestPage {
         await this.editTestTitle.fill(title);
         await this.submitButton.click();
     }
+
     async addParticipantName(name) {
         await this.addNameForUniqueParticipant.isVisible();
         await this.addNameForUniqueParticipant.clear();

@@ -59,7 +59,7 @@ var limiter = rateLimit({
   max: 120
 });
 // apply rate limiter to all requests
-app.use(limiter);
+// app.use(limiter);
 
 require('pkginfo')(module, 'version');
 logger.info("Kort version: " + module.exports.version);
@@ -83,6 +83,7 @@ require('./models/user');
 require('./models/study');
 require('./models/upload');
 require('./models/event');
+require('./models/response');
 
 //setup a default admin account in Mongo
 require('./server/createadmin_user')(adminUser, adminPassword); 
