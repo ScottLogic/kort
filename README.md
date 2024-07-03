@@ -145,6 +145,9 @@ Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` f
 
 2. The `adminUser` and `adminPassword` variables in `app.js` is the username and password for the account that will be created upon first launch. You can set these variables in the `.env` file or as an environment variables. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
 
+3. The `RATE_LIMIT` variable relates to the maximum number of requests that the server will allow over a 10 second period. By default the rate is set at 120. This can be edited in the `.env` file or as an environment variable. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
+**Please note this rate includes any requests the application makes to serve the ui pages such as css and js files, and can make over 20 requests per page.**
+
 <a name="Support"/>
 
 ## Support / Improvement / Suggestions
