@@ -1,10 +1,12 @@
 var mongoose = require('mongoose');
 var Study = mongoose.model('Study');
 var Response = mongoose.model('Response');
+var Event = mongoose.model('Event');
 var resp = require('./response_server');
 var logger = require('./logger.js');
 //https://github.com/vkarpov15/mongo-sanitize
 const sanitize = require('mongo-sanitize'); //helps with MongoDB injection attacks
+const { response } = require('express');
 
 function renderPages(study,responseID,responseObj){
     switch(study.type) {
@@ -135,19 +137,21 @@ module.exports = {
                         logger.error("response_server.js: Cannot find study responses to delete:", error);
                         req.end();
                     } else {
-                        for (var i = 0; i < responses.length; i++) {
-                            responses[i].remove();
-                        }
+                        Event.find({responseID: responses._id}, function(err, events){
+                            if (err) {
+                                req.status(504);
+                                logger.error("Cannot find study events to delete:", error);
+                                req.end();
+                            } else {
+                                events.deleteMany({responseID: response._id})
+                            }
+                        });
+                        // responses.deleteMany({_id: req.params.id});
+                        // for (var i = 0; i < responses.length; i++) {
+                        //     responses[i].remove();
+                        // }
                     }
                 });
-            }
-        }).remove(function (err) {
-            if (err) {
-                logger.error("study_server.js: Error, cannot remove study:", err);
-                res.end(err);
-            } else {
-                res.send(true);
-                res.end();
             }
         });
     },
