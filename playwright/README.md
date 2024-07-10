@@ -10,6 +10,7 @@ A small readMe on how to run the playwright suite and the commands required
     * [Running a single test](#running-a-single-test)
     * [Run a set of tests](#run-a-set-of-test-files)  
     * [Running tests in heeaded mode](#running-tests-in-headed-mode)
+    * [Running tests on a specific browser engine](#running-tests-on-specific-browser)
 
 
 ## How to set up throttle limiter for testing
