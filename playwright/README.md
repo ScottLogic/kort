@@ -41,20 +41,27 @@ npx playwright test
 
 ### Running a single test:
 
-Navigate into test folder you would like to run within the playwright folder i.e /ui-tests.
+Navigate into test folder you would like to run within the playwright folder i.e /test-folder.
+
+_CD into the folder you wish to run tests in and change file-name to the file you wish to use_
 ```
 npx playwright test file-name
 ```
 
 ### Run a set of test files:
 
+_CD into the repo you wish to run tests in and change file-name to the file you wish to use_
+
 ```
-npx playwright test ui-tests/todo-page/ ui-tests/landing-page/
+npx playwright test testsfolder/file-name/ test-folder/file-name/
 ```
 
 ### Running tests in headed mode:
 
 By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. Headed mode opens a browser window when the tests run so that the steps of the test can be viewed in real time
+
+_Change file-name to the file you wish to use_
+
 ```
 npx playwright test file-name -- --headed
 ```
@@ -62,6 +69,8 @@ npx playwright test file-name -- --headed
 ### Running tests on a specific browser engine:
 
 Unless specified in `playwright.config` you cannot call a specific browser engine that is not there so make sure to check that the config allows for this
+
+_Change file-name to the file you wish to use_
 
 ```
 npx playwright test file-name -- --project=chromium
