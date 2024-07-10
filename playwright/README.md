@@ -20,7 +20,7 @@ When building the test suite it was found that the tests would max out the rate 
 To set this up for testing do the following:
 
 * Make sure you have down docker compose down 
-* Before building a new docker image go into `app.js` and set the `DEFAULT_RATE_LIMIT` variable to 
+* Before building a new docker image go into you `.env` and set the `RATE_LIMIT` variable to **1000** (this is a suggestion if you think you need more put more, if you think you need less put less)
 * Build and run a new docker image via docker-compose build and docker-compose up
 
 This is to be done before any tests are run otherwise the limiter will max out and the tests will fail.
