@@ -153,12 +153,19 @@ module.exports = {
     },
     submitResult: function (req, res, next) {
         var clean_id = sanitize(req.body.id);
+        var max_retries = 3;
 
+        // recursive function to save the response
+        function attemptSave(retries){
          Study.findOne({_id: clean_id}, function (err, study) {
             if (err) {
-                res.status(504);
-                logger.error("study_server.js: Error in submit result:", err);
-                res.end(err);
+                if (retries < max_retries) {
+                    logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
+                    attemptSave(parseInt(retries + 1));
+                }else{
+                    res.status(504);
+                    res.end(err)
+                }
             } else {
                 //if the study is being previewed, don't record the response
                 if (req.body.resid === "preview"){
@@ -169,13 +176,41 @@ module.exports = {
 
                     Response.findOne({_id: clean_resid}, function(err,response) {
                         if (err) {
+                            if (retries < max_retries) {
+                                logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
+                                attemptSave(parseInt(retries + 1));
+                            }else{
                             req.status(504);
-                            logger.error("response_server.js: Cannot find study responses to delete:", error);
+                            logger.error("response_server.js: Cannot find study responses to delete:", err);
                             req.end();
+                            }
                         } else {
                             if (response.complete){
-                                res.redirect('/msg/nomore');
-                                res.end();
+                                // if the response is already complete and is not in the completeResponses array, add it to the array
+                                // TODO: CHECK COMPLETE AND INCOMPLETE ARRAY FOR RESPONSE
+                                if(!study.completeResponses.includes(clean_resid)){
+                                    var respIdxRetry = study.incompleteResponses.indexOf(req.body.resid);
+                                    study.completeResponses.push(study.incompleteResponses[respIdxRetry]);
+                                    study.incompleteResponses.splice(respIdxRetry,1);
+                                    study.save(function(err) {
+                                        if (err) {
+                                            if (retries < max_retries) {
+                                                logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
+                                                attemptSave(retries + 1);
+                                            } else {
+                                                logger.error("study_server.js: Error saving study:", err);
+                                                res.status(500).send(err);
+                                            }
+                                        } else {
+                                            logger.info("study_server.js: Response saved successfully.");
+                                            res.redirect('/msg/thanks');
+                                            res.end();
+                                        }
+                                    });
+                                } else {
+                                    res.redirect('/msg/nomore');
+                                    res.end();
+                                }
                             } else {
                                  Response.findOneAndUpdate({"_id": clean_resid},
                                     { "$set": { "complete": true,
@@ -191,18 +226,29 @@ module.exports = {
                                 var respIdx = study.incompleteResponses.indexOf(req.body.resid);
                                 study.completeResponses.push(study.incompleteResponses[respIdx]);
                                 study.incompleteResponses.splice(respIdx,1);
-                                //save the study object (which will save the child objects)
-                                study.save();
-                                res.redirect('/msg/thanks');
-                                res.end();
+                                study.save(function(err) {
+                                    if (err) {
+                                        if (retries < max_retries) {
+                                            logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
+                                            attemptSave(retries + 1);
+                                        } else {
+                                            logger.error("study_server.js: Error saving study:", err);
+                                            res.status(500).send(err);
+                                        }
+                                    } else {
+                                        logger.info("study_server.js: Response saved successfully.");
+                                        res.redirect('/msg/thanks');
+                                        res.end();
+                                    }
+                                });
                             }
                         }
                     });
-
                 }
-
             }
         });
+        }
+        attemptSave(0);
     },
     deleteAllIncompleteResponses: function(req, res, next) {
         Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
