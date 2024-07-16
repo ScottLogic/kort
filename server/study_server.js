@@ -155,6 +155,12 @@ module.exports = {
         var clean_id = sanitize(req.body.id);
         var max_retries = 3;
 
+        //if the study is being previewed, don't record the response
+        if (req.body.resid === "preview") {
+            res.redirect('/studies');
+            res.end();
+        }
+
         // function to save complete response to study and remove from incomplete responses
         function saveStudy(study, responseID, retries){
             var respIdx = study.incompleteResponses.indexOf(responseID);
@@ -162,11 +168,11 @@ module.exports = {
             study.incompleteResponses.splice(respIdx,1);
             study.save(function(err) {
                 if (err) {
+                    logger.error("study_server.js: Error saving response to study:", err);
                     if (retries < max_retries) {
                         logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
                         handleAndSaveResults(retries + 1);
                     } else {
-                        logger.error("study_server.js: Error saving response to study:", err);
                         res.status(500).send(err);
                     }
                 } else {
@@ -183,47 +189,40 @@ module.exports = {
                     res.status(504);
                     res.end(err)
                 } else {
-                    //if the study is being previewed, don't record the response
-                    if (req.body.resid === "preview") {
-                        res.redirect('/studies');
-                        res.end();
-                    } else {
-                        var clean_resid = sanitize(req.body.resid);
-
-                        Response.findOne({_id: clean_resid}, function(err,response) {
-                            if (err) {
-                                req.status(504);
-                                logger.error("response_server.js: Cannot find study responses to delete:", err);
-                                req.end();
-                            } else {
-                                if (response.complete) {
-                                    // if the response is already complete and is not in the completeResponses array, add it to the array
-                                    if(!study.completeResponses.includes(clean_resid)) {
-                                        saveStudy(study, clean_resid, retries);
-                                    } else {
-                                        res.redirect('/msg/nomore');
-                                        res.end();
-                                    }
-                                } else {
-                                    Response.findOneAndUpdate({"_id": clean_resid},
-                                        { "$set": { "complete": true,
-                                                    "date": new Date(Date.now()),
-                                                    "data": JSON.parse(req.body.result)}
-                                        }).exec(function(err, book){
-                                           if(err) {
-                                               console.log(err);
-                                               res.status(500).send(err);
-                                           }
-                                    });
+                    var clean_resid = sanitize(req.body.resid);
+                    Response.findOne({_id: clean_resid}, function(err,response) {
+                        if (err) {
+                            req.status(504);
+                            logger.error("response_server.js: Cannot find study responses to delete:", err);
+                            req.end();
+                        } else {
+                            if (response.complete) {
+                                // if the response is already complete and is not in the completeResponses array, add it to the array
+                                if (!study.completeResponses.includes(clean_resid)) {
                                     saveStudy(study, clean_resid, retries);
+                                } else {
+                                    res.redirect('/msg/nomore');
+                                    res.end();
                                 }
+                            } else {
+                                Response.findOneAndUpdate({"_id": clean_resid},
+                                    { "$set": { "complete": true,
+                                                "date": new Date(Date.now()),
+                                                "data": JSON.parse(req.body.result)}
+                                            }).exec(function(err){
+                                                if(err) {
+                                                    console.log(err);
+                                                    res.status(500).send(err);
+                                                }
+                                            });
+                            saveStudy(study, clean_resid, retries);
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             });
         }
-        handleAndSaveResults(0); 
+        handleAndSaveResults(1); 
     },
     deleteAllIncompleteResponses: function(req, res, next) {
         Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
