@@ -53,7 +53,7 @@ var logger = require('./server/logger.js');
 const path = require('path');
 
 // set up rate limiter: maximum of 120 requests per 10 seconds
-const DEFAULT_RATE_LIMIT = 2000;
+const DEFAULT_RATE_LIMIT = 120;
 const requestRateLimit = process.env.RATE_LIMIT  || DEFAULT_RATE_LIMIT;
 
 var rateLimit = require('express-rate-limit');
