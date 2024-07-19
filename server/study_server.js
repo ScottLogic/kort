@@ -5,6 +5,7 @@ var resp = require('./response_server');
 var logger = require('./logger.js');
 //https://github.com/vkarpov15/mongo-sanitize
 const sanitize = require('mongo-sanitize'); //helps with MongoDB injection attacks
+const { log } = require('async');
 
 function renderPages(study,responseID,responseObj){
     switch(study.type) {
@@ -153,6 +154,7 @@ module.exports = {
     },
     submitResult: function (req, res, next) {
         var clean_id = sanitize(req.body.id);
+        var clean_resid = sanitize(req.body.resid);
         var max_retries = 3;
 
         //if the study is being previewed, don't record the response
@@ -161,68 +163,71 @@ module.exports = {
             res.end();
         }
 
-        // function to save complete response to study and remove from incomplete responses
-        function saveStudy(study, responseID, retries){
-            var respIdx = study.incompleteResponses.indexOf(responseID);
-            study.completeResponses.push(study.incompleteResponses[respIdx]);
-            study.incompleteResponses.splice(respIdx,1);
-            study.save(function(err) {
-                if (err) {
-                    logger.error("study_server.js: Error saving response to study:", err);
-                    if (retries < max_retries) {
-                        logger.warn(`Retrying... (${retries + 1}/${max_retries})`);
-                        handleAndSaveResults(retries + 1);
-                    } else {
-                        res.status(500).send(err);
-                    }
-                } else {
-                    logger.info("study_server.js: Response saved successfully to study.");
-                    res.redirect('/msg/thanks');
-                    res.end();
+        function updateStudy() {
+            Study.findOne({ "_id": clean_id }).then(study => {
+                if (!study) {
+                    logger.error("Study not found");
+                    res.status(404).send("Study not found");
                 }
+                return Study.findOneAndUpdate(
+                    { "_id": clean_id },
+                    {
+                        "$pull": { "incompleteResponses": mongoose.Types.ObjectId(clean_resid) },
+                        "$push": { "completeResponses": clean_resid }
+                    }
+                );
+            }).then(() => {
+                return Study.findOne({ "_id": clean_id });
+            }).then(updatedStudy => {
+                // is response in completeResponses?
+                if (updatedStudy.completeResponses.indexOf(mongoose.Types.ObjectId(clean_resid)) === -1) {
+                    logger.error("study_server.js: Response not saved to study.");
+                    res.status(500).send("Response not saved to study.");
+                    res.end();
+                }else {
+                logger.info("study_server.js: Response saved successfully to study.");
+                res.redirect('/msg/thanks');
+                res.end();
+                }
+            }).catch(err => {
+                logger.error("study_server.js: Error saving response to study:", err);
+                res.status(500).send(err);
             });
         }
 
-        function handleAndSaveResults(retries) {
-            Study.findOne({_id: clean_id}, function (err, study) {
-                if (err) {
-                    res.status(504);
-                    res.end(err)
-                } else {
-                    var clean_resid = sanitize(req.body.resid);
-                    Response.findOne({_id: clean_resid}, function(err,response) {
-                        if (err) {
-                            req.status(504);
-                            logger.error("response_server.js: Cannot find study responses to delete:", err);
-                            req.end();
-                        } else {
-                            if (response.complete) {
-                                // if the response is already complete and is not in the completeResponses array, add it to the array
-                                if (!study.completeResponses.includes(clean_resid)) {
-                                    saveStudy(study, clean_resid, retries);
-                                } else {
-                                    res.redirect('/msg/nomore');
-                                    res.end();
-                                }
-                            } else {
-                                Response.findOneAndUpdate({"_id": clean_resid},
-                                    { "$set": { "complete": true,
-                                                "date": new Date(Date.now()),
-                                                "data": JSON.parse(req.body.result)}
-                                            }).exec(function(err){
-                                                if(err) {
-                                                    console.log(err);
-                                                    res.status(500).send(err);
-                                                }
-                                            });
-                            saveStudy(study, clean_resid, retries);
-                            }
-                        }
-                    });
+        function saveResponse(){
+            Response.findOne({_id: clean_resid}).then(response => {
+                if (!response) {
+                    logger.error("Response not found");
+                    res.status(404).send("Response not found");
                 }
-            });
+                if(response.complete){
+                    logger.error("Response already complete");
+                    res.status(400).send("Response already complete");
+                }
+                return Response.findOneAndUpdate({"_id": clean_resid},
+                    { "$set": { "complete": true,
+                        "date": new Date(Date.now()),
+                        "data": JSON.parse(req.body.result)}
+                    }
+                );
+            }).then(updatedResponse =>{
+                logger.info("study_server.js: Response saved.");
+            }).catch(err => {
+                logger.error("study_server.js: Error saving response to response table:", err)}
+            );
         }
-        handleAndSaveResults(1); 
+
+        function handleAndSaveResults(retries) {
+            // TODO: Add retry logic as whilst more stable it does not handle all cases
+            // TODO: check that response has been saved to response table before updating study
+            
+                saveResponse();
+                updateStudy();
+        }
+
+        handleAndSaveResults(1)
+
     },
     deleteAllIncompleteResponses: function(req, res, next) {
         Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
