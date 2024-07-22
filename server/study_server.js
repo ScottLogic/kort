@@ -5,7 +5,6 @@ var resp = require('./response_server');
 var logger = require('./logger.js');
 //https://github.com/vkarpov15/mongo-sanitize
 const sanitize = require('mongo-sanitize'); //helps with MongoDB injection attacks
-const { log } = require('async');
 
 function renderPages(study,responseID,responseObj){
     switch(study.type) {
