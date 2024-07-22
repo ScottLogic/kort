@@ -126,23 +126,23 @@ module.exports = {
     delete: function(req, res, next) {
         Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
             if (err) {
-                req.status(504);
+                res.status(504);
                 logger.error("study_server.js: Error, cannot find study to delete:", err);
-                req.end();
+                res.end();
             } else {
                 Response.find({ studyID: req.params.id}, function(err,responses) {
                     if (err) {
-                        req.status(504);
+                        res.status(504);
                         logger.error("response_server.js: Cannot find study responses to delete:", err);
-                        req.end();
+                        res.end();
                     } else {
                         for (var i = 0; i < responses.length; i++) {
                              Event.find({ responseId: responses[i]._id}, function(err,events)
                              {
                                 if (err) {
-                                    req.status(504);
+                                    res.status(504);
                                     logger.error("response_server.js: Cannot find study events to delete:", err);
-                                    req.end();
+                                    res.end();
                                 }
                                 else {
                                     events[i].deleteOne(function(err){
@@ -169,6 +169,8 @@ module.exports = {
                         logger.error("study_server.js: Error trying to delete study:", err);
                         res.status(500).send(err);
                     }
+                    //Needs tested was put on eod
+                    console.log("Delete successful")
                 });
                 res.send(true);
                 res.end();
