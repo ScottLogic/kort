@@ -1,12 +1,11 @@
 var mongoose = require('mongoose');
 var Study = mongoose.model('Study');
 var Response = mongoose.model('Response');
-var Event = mongoose.model('Event');
+var Event = mongoose.model('Event')
 var resp = require('./response_server');
 var logger = require('./logger.js');
 //https://github.com/vkarpov15/mongo-sanitize
 const sanitize = require('mongo-sanitize'); //helps with MongoDB injection attacks
-const { response } = require('express');
 
 function renderPages(study,responseID,responseObj){
     switch(study.type) {
@@ -125,7 +124,7 @@ module.exports = {
         });
     },
     delete: function(req, res, next) {
-        Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err) {
+        Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
             if (err) {
                 req.status(504);
                 logger.error("study_server.js: Error, cannot find study to delete:", err);
@@ -134,24 +133,45 @@ module.exports = {
                 Response.find({ studyID: req.params.id}, function(err,responses) {
                     if (err) {
                         req.status(504);
-                        logger.error("response_server.js: Cannot find study responses to delete:", error);
+                        logger.error("response_server.js: Cannot find study responses to delete:", err);
                         req.end();
                     } else {
-                        Event.find({responseID: responses._id}, function(err, events){
-                            if (err) {
-                                req.status(504);
-                                logger.error("Cannot find study events to delete:", error);
-                                req.end();
-                            } else {
-                                events.deleteMany({responseID: response._id})
-                            }
-                        });
-                        // responses.deleteMany({_id: req.params.id});
-                        // for (var i = 0; i < responses.length; i++) {
-                        //     responses[i].remove();
-                        // }
+                        for (var i = 0; i < responses.length; i++) {
+                             Event.find({ responseId: responses[i]._id}, function(err,events)
+                             {
+                                if (err) {
+                                    req.status(504);
+                                    logger.error("response_server.js: Cannot find study events to delete:", err);
+                                    req.end();
+                                }
+                                else {
+                                    events[i].deleteOne(function(err){
+                                    if(err) {
+                                        logger.error("response_server.js: Error trying to delete event:", err);
+                                        res.status(500).send(err);
+                                        }
+                                    })
+                                } 
+                            });                       
+                            
+                            responses[i].deleteOne(function(err){
+                                if(err) {
+                                    logger.error("response_server.js: Error trying to delete response:", err);
+                                    res.status(500).send(err);
+                                }
+                            });
+                        }
+                    }
+                });         
+
+                study.deleteOne(function(err){
+                    if(err) {
+                        logger.error("study_server.js: Error trying to delete study:", err);
+                        res.status(500).send(err);
                     }
                 });
+                res.send(true);
+                res.end();
             }
         });
     },
