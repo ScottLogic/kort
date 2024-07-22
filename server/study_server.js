@@ -161,7 +161,7 @@ module.exports = {
             res.end();
         }
 
-        function updateStudy(clean_id, clean_resid) {
+        function updateStudy() {
             Study.findOneAndUpdate(
                 { "_id": clean_id },
                 {
@@ -170,7 +170,7 @@ module.exports = {
                 },
                 function (err) {
                     if (err) {
-                        logger.error("study_server.js: home section error:", err);
+                        logger.error("study_server.js: error has occured: ", err);
                         res.status(500).send(err);
                         res.end();
                     } else {
@@ -185,13 +185,13 @@ module.exports = {
         function saveResponse(){
             Response.findOne({_id: clean_resid}).then(response => {
                 if (!response) {
-                    logger.error("Response not found");
+                    logger.error("study_server.js: Response not found");
                     res.status(404).send("Response not found");
                     res.end();
                 }
                 if(response.complete){
-                    logger.error("Response already complete");
-                    res.status(400).send("Response already complete");
+                    logger.error("study_server.js: The response has already been completed");
+                    res.status(400).send("The response has already been completed");
                     res.end()
                 }
                 return Response.findOneAndUpdate({"_id": clean_resid},
@@ -204,7 +204,7 @@ module.exports = {
         }
 
         saveResponse()
-        updateStudy(clean_id, clean_resid)
+        updateStudy()
 
     },
     deleteAllIncompleteResponses: function(req, res, next) {
