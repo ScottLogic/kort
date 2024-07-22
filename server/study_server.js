@@ -155,7 +155,6 @@ module.exports = {
     submitResult: function (req, res, next) {
         var clean_id = sanitize(req.body.id);
         var clean_resid = sanitize(req.body.resid);
-        var max_retries = 3;
 
         //if the study is being previewed, don't record the response
         if (req.body.resid === "preview") {
@@ -163,47 +162,38 @@ module.exports = {
             res.end();
         }
 
-        function updateStudy() {
-            Study.findOne({ "_id": clean_id }).then(study => {
-                if (!study) {
-                    logger.error("Study not found");
-                    res.status(404).send("Study not found");
+        function updateStudy(clean_id, clean_resid) {
+            Study.findOneAndUpdate(
+                { "_id": clean_id },
+                {
+                    "$pull": { "incompleteResponses": mongoose.Types.ObjectId(clean_resid) },
+                    "$push": { "completeResponses": clean_resid }
+                },
+                function (err) {
+                    if (err) {
+                        logger.error("study_server.js: home section error:", err);
+                        res.status(500).send(err);
+                        res.end();
+                    } else {
+                        logger.info("study_server.js: Response saved successfully to study.");
+                        res.redirect('/msg/thanks');
+                        res.end();
+                    } 
                 }
-                return Study.findOneAndUpdate(
-                    { "_id": clean_id },
-                    {
-                        "$pull": { "incompleteResponses": mongoose.Types.ObjectId(clean_resid) },
-                        "$push": { "completeResponses": clean_resid }
-                    }
-                );
-            }).then(() => {
-                return Study.findOne({ "_id": clean_id });
-            }).then(updatedStudy => {
-                // is response in completeResponses?
-                if (updatedStudy.completeResponses.indexOf(mongoose.Types.ObjectId(clean_resid)) === -1) {
-                    logger.error("study_server.js: Response not saved to study.");
-                    res.status(500).send("Response not saved to study.");
-                    res.end();
-                }else {
-                logger.info("study_server.js: Response saved successfully to study.");
-                res.redirect('/msg/thanks');
-                res.end();
-                }
-            }).catch(err => {
-                logger.error("study_server.js: Error saving response to study:", err);
-                res.status(500).send(err);
-            });
-        }
+            );
+    }
 
         function saveResponse(){
             Response.findOne({_id: clean_resid}).then(response => {
                 if (!response) {
                     logger.error("Response not found");
                     res.status(404).send("Response not found");
+                    res.end();
                 }
                 if(response.complete){
                     logger.error("Response already complete");
                     res.status(400).send("Response already complete");
+                    res.end()
                 }
                 return Response.findOneAndUpdate({"_id": clean_resid},
                     { "$set": { "complete": true,
@@ -211,22 +201,11 @@ module.exports = {
                         "data": JSON.parse(req.body.result)}
                     }
                 );
-            }).then(updatedResponse =>{
-                logger.info("study_server.js: Response saved.");
-            }).catch(err => {
-                logger.error("study_server.js: Error saving response to response table:", err)}
-            );
+            })
         }
 
-        function handleAndSaveResults(retries) {
-            // TODO: Add retry logic as whilst more stable it does not handle all cases
-            // TODO: check that response has been saved to response table before updating study
-            
-                saveResponse();
-                updateStudy();
-        }
-
-        handleAndSaveResults(1)
+        saveResponse()
+        updateStudy(clean_id, clean_resid)
 
     },
     deleteAllIncompleteResponses: function(req, res, next) {
