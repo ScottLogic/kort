@@ -1,13 +1,35 @@
 // User defined settings -------------------------------------------
 
-const port = process.env.PORT || 3000;
 //https://docs.mongodb.com/manual/reference/connection-string/
 //with a username and password: 'mongodb://kort:123@127.0.0.1/kort'
-var mongoURL = 'mongodb://127.0.0.1:27017/kort';
-if (process.env.MONGO_HOST){
-    //if we're launched from Docker
-    mongoURL = 'mongodb://'+process.env.MONGO_HOST+':27017/kort';
+const DEFAULT_MONGO_HOST = "127.0.0.1";
+const MONGO_PORT = "27017";
+const MONGO_DATABASE = "kort";
+const mongoHost = process.env.MONGO_HOST || DEFAULT_MONGO_HOST;
+
+var mongoURL = "mongodb://";
+
+const mongo_kort_username = process.env.MONGO_KORT_USERNAME
+const mongo_kort_password = process.env.MONGO_KORT_PASSWORD
+
+if ((mongo_kort_username && !mongo_kort_password) || (!mongo_kort_username && mongo_kort_password)   ) {
+    var err =
+      "Missing 'MONGO_KORT_USERNAME' or 'MONGO_KORT_PASSWORD' environment variable.\n"+
+      "Both must be specified to create a kort db user";
+    console.warn(err);
+    throw new Error(err);
+  }
+else if (mongo_kort_username && mongo_kort_password) {
+  mongoURL += mongo_kort_username + ":" + mongo_kort_password + "@";
 }
+
+mongoURL += mongoHost + ":" + MONGO_PORT;
+mongoURL += "/" + MONGO_DATABASE;
+if (process.env.MONGO_OPTIONS) {
+  mongoURL += "?" + process.env.MONGO_OPTIONS;
+}
+
+const port = process.env.PORT || 3000;
 
 //load in environment variables
 require('dotenv').config();
