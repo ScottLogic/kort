@@ -170,7 +170,7 @@ module.exports = {
                 },
                 function (err) {
                     if (err) {
-                        logger.error("study_server.js: error has occured: ", err);
+                        logger.error("study_server.js: Error has occured: ", err);
                         res.status(500).send(err);
                         res.end();
                     } else {
