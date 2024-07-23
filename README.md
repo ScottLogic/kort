@@ -117,6 +117,15 @@ on the default port 3000.
 
 3. Ensure you create a `.env` file in the root of the project directory with the required environment variables (See `example.env`). If you choose to set the environment variables directly, remove any refences to the `.env` file in `docker-compose.yml` to prevent docker compose looking for it at build time.  
 
+   If you wish to secure the connection between the `kort` and `mongo` containers,
+   uncomment the `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD`,
+   `MONGO_INITDB_DATABASE`, `MONGO_KORT_USERNAME` and `MONGO_KORT_PASSWORD` values
+   in the `.env` file and define the required credentials.
+
+   If you need to specify connection options for the connection from  the `kort` to
+   the `mongo` containers, uncomment the `MONGO_OPTIONS` value in the `.env` file
+   and define the required connection options in url parameter format.
+
 4. Build the containers
 
     ```shell
