@@ -34,13 +34,13 @@ if (process.env.MONGO_OPTIONS) {
 
 const port = process.env.PORT || 3000;
 
-//default admin user and password
-const DEFAULT_ADMIN_USER = 'admin';
-const DEFAULT_ADMIN_PASSWORD = 'admin';
-const adminUser = process.env.ADMIN_USER || DEFAULT_ADMIN_USER;
-const adminPassword = process.env.ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD;
-if (adminUser === DEFAULT_ADMIN_USER && adminPassword === DEFAULT_ADMIN_PASSWORD) {
-    console.warn("No admin user and/or password set, using default admin/admin");
+//default Kort admin user and password
+const DEFAULT_KORT_ADMIN_USER = 'admin';
+const DEFAULT_KORT_ADMIN_PASSWORD = 'admin';
+const kortAdminUser = process.env.KORT_ADMIN_USER || DEFAULT_KORT_ADMIN_USER;
+const kortAdminPassword = process.env.KORT_ADMIN_PASSWORD || DEFAULT_KORT_ADMIN_PASSWORD;
+if (kortAdminUser === DEFAULT_KORT_ADMIN_USER && kortAdminPassword === DEFAULT_KORT_ADMIN_PASSWORD) {
+    console.warn("No Kort admin user and/or password set, using default " + DEFAULT_KORT_ADMIN_USER + "/"+ DEFAULT_KORT_ADMIN_PASSWORD);
 }
 
 const allowGoogleAuth = false; //allowUserRegistration must be set to true as well to enable this
@@ -109,8 +109,8 @@ require('./models/study');
 require('./models/upload');
 require('./models/event');
 
-//setup a default admin account in Mongo
-require('./server/createadmin_user')(adminUser, adminPassword); 
+//setup a default Kort admin account in Mongo
+require('./server/createadmin_user')(kortAdminUser, kortAdminPassword);
 
 app.set('view engine', 'ejs');
 
