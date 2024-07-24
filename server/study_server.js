@@ -145,12 +145,14 @@ module.exports = {
                                     res.end();
                                 }
                                 else {
-                                    events[i].deleteOne(function(err){
-                                    if(err) {
-                                        logger.error("response_server.js: Error trying to delete event:", err);
-                                        res.status(500).send(err);
-                                        }
-                                    })
+                                    for (var i = 0; i < events.length; i++) {
+                                        events[i].deleteOne(function(err){
+                                        if(err) {
+                                            logger.error("response_server.js: Error trying to delete event:", err);
+                                            res.status(500).send(err);
+                                            }
+                                        })
+                                    }
                                 } 
                             });                       
                             
@@ -169,8 +171,6 @@ module.exports = {
                         logger.error("study_server.js: Error trying to delete study:", err);
                         res.status(500).send(err);
                     }
-                    //Needs tested was put on eod
-                    console.log("Delete successful")
                 });
                 res.send(true);
                 res.end();
