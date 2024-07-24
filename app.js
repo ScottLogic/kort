@@ -1,5 +1,8 @@
 // User defined settings -------------------------------------------
 
+//load in environment variables
+require('dotenv').config();
+
 //https://docs.mongodb.com/manual/reference/connection-string/
 //with a username and password: 'mongodb://kort:123@127.0.0.1/kort'
 const DEFAULT_MONGO_HOST = "127.0.0.1";
@@ -30,9 +33,6 @@ if (process.env.MONGO_OPTIONS) {
 }
 
 const port = process.env.PORT || 3000;
-
-//load in environment variables
-require('dotenv').config();
 
 //default admin user and password
 const DEFAULT_ADMIN_USER = 'admin';
