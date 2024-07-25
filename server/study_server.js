@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Study = mongoose.model('Study');
 var Response = mongoose.model('Response');
+var Event = mongoose.model('Event')
 var resp = require('./response_server');
 var logger = require('./logger.js');
 //https://github.com/vkarpov15/mongo-sanitize
@@ -123,29 +124,54 @@ module.exports = {
         });
     },
     delete: function(req, res, next) {
-        Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err) {
+        Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
             if (err) {
-                req.status(504);
+                res.status(504);
                 logger.error("study_server.js: Error, cannot find study to delete:", err);
-                req.end();
+                res.end();
             } else {
                 Response.find({ studyID: req.params.id}, function(err,responses) {
                     if (err) {
-                        req.status(504);
-                        logger.error("response_server.js: Cannot find study responses to delete:", error);
-                        req.end();
+                        res.status(504);
+                        logger.error("response_server.js: Cannot find study responses to delete:", err);
+                        res.end();
                     } else {
                         for (var i = 0; i < responses.length; i++) {
-                            responses[i].remove();
+                             Event.find({ responseId: responses[i]._id}, function(err,events)
+                             {
+                                if (err) {
+                                    res.status(504);
+                                    logger.error("response_server.js: Cannot find study events to delete:", err);
+                                    res.end();
+                                }
+                                else {
+                                    for (var i = 0; i < events.length; i++) {
+                                        events[i].deleteOne(function(err){
+                                        if(err) {
+                                            logger.error("response_server.js: Error trying to delete event:", err);
+                                            res.status(500).send(err);
+                                            }
+                                        })
+                                    }
+                                } 
+                            });                       
+                            
+                            responses[i].deleteOne(function(err){
+                                if(err) {
+                                    logger.error("response_server.js: Error trying to delete response:", err);
+                                    res.status(500).send(err);
+                                }
+                            });
                         }
                     }
+                });         
+
+                study.deleteOne(function(err){
+                    if(err) {
+                        logger.error("study_server.js: Error trying to delete study:", err);
+                        res.status(500).send(err);
+                    }
                 });
-            }
-        }).remove(function (err) {
-            if (err) {
-                logger.error("study_server.js: Error, cannot remove study:", err);
-                res.end(err);
-            } else {
                 res.send(true);
                 res.end();
             }
