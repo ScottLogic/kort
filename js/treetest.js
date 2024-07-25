@@ -1,4 +1,4 @@
-
+const { v4: uuidv4 } = uuid;
 //--------------------Initialize Treeview Object---------------------
 function bindNextButton(){
 	$("#nextTaskButton").on("click", function() {
@@ -200,7 +200,7 @@ var socket = {
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			_id: crypto.randomUUID(),
+			_id: uuidv4(),
 			type: eventType,
 			responseId: document.getElementById('resid').value,
 			isoTimestampSent: new Date().toISOString(),
