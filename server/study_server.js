@@ -181,30 +181,45 @@ module.exports = {
                 }
             );
     }
-
-        function saveResponse(){
-            Response.findOne({_id: clean_resid}).then(response => {
+    
+    function saveResponse() {
+        return new Promise((resolve, reject) => {
+            Response.findOne({ _id: clean_resid }).then(response => {
                 if (!response) {
                     logger.error("study_server.js: Response not found");
                     res.status(404).send("Response not found");
                     res.end();
-                }
-                if(response.complete){
+                    reject(false);
+                } else if (response.complete) {
                     logger.error("study_server.js: The response has already been completed");
-                    res.status(400).send("The response has already been completed");
-                    res.end()
+                    res.redirect('/msg/nomore');
+                    res.end();
+                    reject(false);
+                } else {
+                    Response.findOneAndUpdate(
+                        { "_id": clean_resid },
+                        {
+                            "$set": {
+                                "complete": true,
+                                "date": new Date(Date.now()),
+                                "data": JSON.parse(req.body.result)
+                            }
+                        }
+                    ).then(() => {
+                        resolve(true);
+                    });
                 }
-                return Response.findOneAndUpdate({"_id": clean_resid},
-                    { "$set": { "complete": true,
-                        "date": new Date(Date.now()),
-                        "data": JSON.parse(req.body.result)}
-                    }
-                );
             })
+        })
+    }
+    
+    let promise = saveResponse();
+    
+    promise.then((value) => {
+        if (value) {
+           // updateStudy();
         }
-
-        saveResponse()
-        updateStudy()
+    });
 
     },
     deleteAllIncompleteResponses: function(req, res, next) {
