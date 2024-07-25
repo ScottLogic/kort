@@ -217,7 +217,7 @@ module.exports = {
     
     promise.then((value) => {
         if (value) {
-           // updateStudy();
+           updateStudy();
         }
     });
 
