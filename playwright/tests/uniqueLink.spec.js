@@ -37,4 +37,8 @@ test('Unique link test', async ({ studiesPage, editTreeTestPage, treeTestStudy }
     await treeTestStudy.selectNode('Meats', 'Bacon');
     await treeTestStudy.finishConfirm();
     await expect(treeTestStudy.thankYouMessage).toContainText('Thank you.');
+
+    //Delete Study
+    await studiesPage.goto();
+    await studiesPage.deleteStudy('Unique Link Test');
 });

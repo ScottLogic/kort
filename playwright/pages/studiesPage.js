@@ -8,6 +8,8 @@ export class StudiesPage {
         this.header = this.page.locator('h1', { hasText: 'Studies' });
         this.newStudiesButton = this.page.locator('#newstudy');
         this.studiesTable = this.page.locator('#studies_table');
+        this.modalConfirmDelete = page.getByRole('button', { name: 'Delete Study' });
+        this.modalCancelDelete = page.getByRole('button', { name: 'Cancel' });
     }
 
     async goto() {
@@ -53,5 +55,13 @@ export class StudiesPage {
             this.fr = this.studiesTableBody.locator('td:has-text(\"'+rowName+'\")').locator('..');
         }
         await this.fr.getByText(button).click(); 
+    }
+
+    async deleteStudy(rowName) {
+        this.clickStudyRowButton('Options' , rowName);
+ 
+        this.studyDropdownOptions = this.page.locator('.dropdown-menu');
+        await this.studyDropdownOptions.getByText('Delete', {exact : true}).click();
+        await this.modalConfirmDelete.click();
     }
 }

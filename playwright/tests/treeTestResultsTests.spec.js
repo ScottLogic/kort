@@ -56,4 +56,8 @@ test('Unique link results page test', async ({ studiesPage, resultsPage, editTre
     await expect(resultsPage.taskCell).toContainText('Where is the Apples?');
     await resultsPage.responsesByTask('Where is the Bacon?');
     await expect(resultsPage.taskCell).toContainText('Where is the Bacon?');
+
+    //Delete Studuies
+    await studiesPage.goto();
+    await studiesPage.deleteStudy('ResultPage Link Test');
 });
