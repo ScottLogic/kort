@@ -117,6 +117,15 @@ on the default port 3000.
 
 3. Ensure you create a `.env` file in the root of the project directory with the required environment variables (See `example.env`). If you choose to set the environment variables directly, remove any refences to the `.env` file in `docker-compose.yml` to prevent docker compose looking for it at build time.  
 
+   If you wish to secure the connection between the `kort` and `mongo` containers,
+   uncomment the `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD`,
+   `MONGO_INITDB_DATABASE`, `MONGO_KORT_USERNAME` and `MONGO_KORT_PASSWORD` values
+   in the `.env` file and define the required credentials.
+
+   If you need to specify connection options for the connection from  the `kort` to
+   the `mongo` containers, uncomment the `MONGO_OPTIONS` value in the `.env` file
+   and define the required connection options in url parameter format.
+
 4. Build the containers
 
     ```shell
@@ -143,7 +152,10 @@ Data from MongoDB is persisted and mounted as a Docker volume in the `./data/` f
 
 1. You can connect via [http://localhost:3000](http://localhost:3000)
 
-2. The `adminUser` and `adminPassword` variables in `app.js` is the username and password for the account that will be created upon first launch. You can set these variables in the `.env` file or as an environment variables. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
+2. The admin username and password for Kort can be set using environment variables `KORT_ADMIN_USER` and `KORT_ADMIN_PASSWORD`.
+These can be set in the `.env` file or directly as environment variables.
+**Please note that if you define these variables using both methods, the environment variables will take precedence.**
+If the variables are not set, then a default usename and password of `admin`/`admin` will be used.
 
 3. The `RATE_LIMIT` variable relates to the maximum number of requests that the server will allow over a 10 second period. By default the rate is set at 120. This can be edited in the `.env` file or as an environment variable. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
 **Please note this rate includes any requests the application makes to serve the ui pages such as css and js files, and can make over 20 requests per page.**
