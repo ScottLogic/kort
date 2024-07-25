@@ -54,14 +54,18 @@ export class StudiesPage {
         {
             this.fr = this.studiesTableBody.locator('td:has-text(\"'+rowName+'\")').locator('..');
         }
-        await this.fr.getByText(button).click(); 
+        await this.fr.getByText(button, {exact: true}).click(); 
     }
 
     async deleteStudy(rowName) {
-        this.clickStudyRowButton('Options' , rowName);
+        const row = this.page.locator('td:has-text(\"'+rowName+'\")').locator('..');
+        await row.getByText('Options' , {exact: true}).click();     
  
-        this.studyDropdownOptions = this.page.locator('.dropdown-menu');
-        await this.studyDropdownOptions.getByText('Delete', {exact : true}).click();
+        const studyDropdownOptions = row.locator('.dropdown-menu');
+
+        await studyDropdownOptions.getByText('Delete').click({force: true});
+
         await this.modalConfirmDelete.click();
+
     }
 }
