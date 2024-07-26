@@ -164,7 +164,26 @@ module.exports = {
                             });
                         }
                     }
-                });         
+                });
+                
+                Event.find({ responseId: "preview"}, function(err,events)
+                {
+                    if (err) {
+                        res.status(504);
+                        logger.error("response_server.js: Cannot find study events to delete:", err);
+                        res.end();
+                    }
+                    else {
+                        for (var i = 0; i < events.length; i++) {
+                        events[i].deleteOne(function(err){
+                        if(err) {
+                            logger.error("response_server.js: Error trying to delete event:", err);
+                            res.status(500).send(err);
+                            }
+                        })
+                    }
+                    } 
+                });            
 
                 study.deleteOne(function(err){
                     if(err) {

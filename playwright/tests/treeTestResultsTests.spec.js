@@ -8,26 +8,27 @@ test.beforeEach('Navigation to studies', async ({loginPage, studiesPage}) => {
 });
 
 test('Unique link results page test', async ({ studiesPage, resultsPage, editTreeTestPage, treeTestStudy}) => {
+    const testTitle = 'ResultPage Link Test';
     await studiesPage.clickNewStudy();
 
     //Sets up unique link
     await studiesPage.clickEditButtonForFirstTableRow();
     await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
-    await editTreeTestPage.changeTestTitle('ResultPage Link Test');
-    await studiesPage.clickEditButtonForFirstTableRow('ResultPage Link Test');
+    await editTreeTestPage.changeTestTitle(testTitle);
+    await studiesPage.clickEditButtonForFirstTableRow(testTitle);
     await editTreeTestPage.acceptResponses.click();
     await editTreeTestPage.uniqueParticipantLinkRadioButton.click();
     await editTreeTestPage.addParticipantName('Name'); 
     await editTreeTestPage.submitButton.click();
     
     //Navigate to page again after saving
-    await studiesPage.clickEditButtonForFirstTableRow('ResultPage Link Test');
+    await studiesPage.clickEditButtonForFirstTableRow(testTitle);
 
     //Taking the unique URL from the page, and passing it to the preview page
     await treeTestStudy.goto(await editTreeTestPage.copyUniqueLink('Name'));
 
     //Runs through tree tests
-    await expect(treeTestStudy.header).toContainText('ResultPage Link Test');
+    await expect(treeTestStudy.header).toContainText(testTitle);
     await expect(treeTestStudy.taskNum).toContainText('Task 1 of 2');
     await expect(treeTestStudy.taskQuestion).toContainText('Where is the Apples?');
     await treeTestStudy.selectNode("Fruits","Apple");
@@ -42,9 +43,9 @@ test('Unique link results page test', async ({ studiesPage, resultsPage, editTre
     await studiesPage.goto();
 
     //Results page assertions
-    await studiesPage.clickResultsButtonForFirstTableRow('ResultPage Link Test');
-    await resultsPage.headerText('ResultPage Link Test');
-    await expect(resultsPage.header).toContainText('Results for ResultPage Link Test');
+    await studiesPage.clickResultsButtonForFirstTableRow(testTitle);
+    await resultsPage.headerText(testTitle);
+    await expect(resultsPage.header).toContainText('Results for ' + testTitle);
     await expect(resultsPage.responseCounter).toContainText('1');
     await resultsPage.responses('Name');
     await expect(resultsPage.nameCell).toContainText('Name');
@@ -56,4 +57,8 @@ test('Unique link results page test', async ({ studiesPage, resultsPage, editTre
     await expect(resultsPage.taskCell).toContainText('Where is the Apples?');
     await resultsPage.responsesByTask('Where is the Bacon?');
     await expect(resultsPage.taskCell).toContainText('Where is the Bacon?');
+
+    //Delete Studuies
+    await studiesPage.goto();
+    await studiesPage.deleteStudy(testTitle);
 });
