@@ -1,321 +1,4 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const uuid = require('uuid');
-// -- treetestView.js --
-$(function() {
-    var studyTasks = $('#studyTasks').data("value");
-    var selectableParents = $('#selectableParents').data('value');
-    var showSiblings = $('#showSiblings').data('value');
-    var treeData = $("#treedata").val();
-   
-    setup(studyTasks,treeData,selectableParents,showSiblings);
-})
-
-//--------------------Initialize Treeview Object---------------------
-function bindNextButton(){
-	$("#nextTaskButton").on("click", function() {
-		var modelBodyElement = '<p>Are you sure you want to submit the tree test?</p>';
-		if (tasks.idx < tasks.list.length-1) {
-			modelBodyElement = '<p>Are you sure you want to move to the next task?</p>';
-		}
-
-		const modalElement = $('#nextTaskModal');	
-		modalElement.find('.modal-body').html(modelBodyElement);
-
-		modalElement.modal('show');
-	});
-}
-
-function bindEventsForModal(){
-	$("#continueModalButton").on("click", function() {
-		tasks.next();
-		$('#nextTaskModal').modal('hide');
-	});
-
-	$("#giveUpModalButton").on("click", function() {
-		tasks.giveup();
-		$('#giveUpTaskModal').modal('hide');
-	});
-}
-
-function bindCloseSiblingsOnOpen(){
-	$('#tree').on("before_open.jstree", function (e, data) {
-		var siblings = $("#tree").jstree("get_node", data.node.parent).children;
-		siblings.forEach(function(element){
-			if(element != data.node.id) $("#tree").jstree("close_all", element);
-		})
-	});
-}
-
-function initializeTreeViewObject(treeStructure){
-	$('#tree').jstree({
-		"core" : {
-			"animation" : 0,
-			"check_callback" : true,
-			"themes" : { "stripes" : true, "variant": "large" },
-			"data": JSON.parse(treeStructure)
-		},
-		"plugins" : [
-	    "wholerow"
-	  ]
-	});
-
-	$("#tree").on('ready.jstree', function() {
-		bindEvents();
-	});
-}
-
-function enableButton(buttonID){
-	$(buttonID).removeClass('disabled');
-	$(buttonID).addClass('btn-amber');
-}
-
-function disableButton(buttonID){
-	$(buttonID).removeClass('btn-amber');
-	$(buttonID).addClass('disabled');
-}
-
-function resetTree(){
-	$('#tree').jstree().close_all();
-	$('#tree').jstree().deselect_all(true);
-	disableButton('#nextTaskButton');
-}
-
-function singleClickExpand(parents) {
-	$('#tree').on("changed.jstree", function (e, data) {
-		$("#tree").jstree("toggle_node", data.selected);
-		if (parents) {
-			var node = $('#tree').jstree(true).get_node(data.selected);
-			if(node.children && node.children.length > 0){
-				$("#tree").jstree("deselect_node", data.selected);
-			}
-		}
-	});
-}
-
-function updateProgressBar(){
-	var status = ((tasks.idx/tasks.list.length)*100)+'%';
-	$('#progressbar').css("width", status);
-	$('#progressbar').html('');
-}
-
-function getNodePath(node){
-	return $('#tree').jstree().get_path(node);
-}
-
-//--------------------------Task JS Object---------------------------
-//tasks js object to store task related functions and data
-var tasks = {
-	list: [], //task descriptions
-	answers: [], //full path of nodeIds when answer is selected
-	idx: 0,
-	add: function (taskStr) {
-		this.list.push(taskStr);
-		this.answers.push(false);
-	},
-	next:function() {
-		if (!(this.idx == this.list.length-1)){
-			this.idx = this.idx + 1;
-			this.set(this.idx);
-			updateProgressBar();
-		} else {
-			$('#hiddenResults').val(JSON.stringify(tasks.answers));
-			window.dispatchEvent(new CustomEvent('treetestcompleted'));
-			$('#submitForm').click();
-		}
-		if (this.idx == this.list.length-1){
-			$('#nextTaskButton').html('Finish')
-		}
-	},
-	giveup:function() {
-		this.answers[this.idx] = ['n/a']
-		window.dispatchEvent(new CustomEvent('giveup'));
-
-		this.next();
-	},
-	set:function(number){
-		this.idx = number;
-		$('#taskDesc').html(this.list[number]);
-		$('#taskNum').html("Task "+(number+1)+" of "+this.list.length);
-
-		// Resetting the tree between tasks results in all open nodes closing, but
-		// we don't want to register these as close node events, because they aren't
-		// meaningfully user actions. So we pause listening for close node events
-		const { emitCloseNodeEvent } = socket;
-		socket.emitCloseNodeEvent = () => {};
-
-		resetTree();
-
-		// Start listening for close node events again
-		socket.emitCloseNodeEvent = emitCloseNodeEvent;
-
-		window.dispatchEvent(new CustomEvent('taskchanged',));
-	},
-}
-
-var socket = {
-	_socket: null,
-
-	connect: function() {
-		this._socket = io();
-		this._socket.on('connect', () => {
-			console.debug('Socket connected');
-		});
-		this._socket.on('disconnect', (reason) => {
-			console.debug(`Socket disconnected. Reason: ${reason}`);
-		});
-	},	
-
-	emitPageLoadEvent: function() {
-		this._emitEvent({}, 'page_load');
-	},
-
-	emitSelectNodeEvent: function(node) {
-		this._emitNodeActionEvent(node, 'select_node');
-	},
-
-	emitOpenNodeEvent: function(node) {
-		this._emitNodeActionEvent(node, 'open_node');
-	},
-
-	emitCloseNodeEvent: function(node) {
-		this._emitNodeActionEvent(node, 'close_node');
-	},
-
-	emitTaskChangedEvent: function() {
-		this._emitEvent({}, 'task_changed');
-	},
-
-	emitGiveUpEvent: function() {
-		this._emitEvent({}, 'give_up');
-	},	
-
-	emitTreeTestCompletedEvent: function() {
-		this._emitEvent({}, 'tree_test_completed');
-	},
-
-	emitWindowVisibilityChangedEvent: function(newVisibilityState) {
-		//https://html.spec.whatwg.org/multipage/interaction.html#visibility-state
-		const isVisible = newVisibilityState === 'visible';
-
-		const data = { visible: isVisible };
-		this._emitEvent(data, 'window_visibility_changed');
-	},
-
-	_emitNodeActionEvent: function(node, eventType) {
-		const data = {
-			taskIndex: tasks.idx + 1,
-			node: getNodePath(node),
-		};
-		this._emitEvent(data, eventType);
-	},
-
-	_emitEvent: function(data, eventType) {
-		const json = JSON.stringify({
-			_id: uuid.v4(),
-			type: eventType,
-			responseId: document.getElementById('resid').value,
-			isoTimestampSent: new Date().toISOString(),
-			...data,
-		});
-		const emitUntilAcknowledged = () => this._socket
-			.timeout(2000)
-			.emit(eventType, json, (err) => err && emitUntilAcknowledged());
-		emitUntilAcknowledged();
-	},
-}
-
-//---------------------Task List Initialization----------------------
-function setup(input_tasks,input_tree,input_selectableParents,input_closeSiblings){
-	var tasksDB = input_tasks.split(";").map(function(item) {
-		  return item.trim();
-	});
-	for (var i = 0; i < tasksDB.length; i++) {
-		if (tasksDB[i] != ''){
-			tasks.add(tasksDB[i]);
-		}
-	}
-	//create treeview structure from database information
-	initializeTreeViewObject(input_tree);
-	if(input_closeSiblings){
-		bindCloseSiblingsOnOpen();
-	}
-	//this parameter is whether or not parents can be selected when clicked
-	singleClickExpand(!input_selectableParents);
-	$('#hiddenTree').remove();
-	$('#treedata').remove();
-	tasks.set(0);
-	disableButton('#nextTaskButton');
-	bindNextButton();
-	bindEventsForModal();
-
-	socket.connect();
-	socket.emitPageLoadEvent();
-}
-
-function bindEvents() {	
-	bindOnSelectNode();
-	bindOnDeselectNode();
-	bindEmitOnOpenNode();
-	bindEmitOnCloseNode();
-	bindEmitOnTaskChanged();
-	bindEmitOnGiveUp();
-	bindEmitOnTreeTestCompletion();
-	bindEmitOnWindowVisibilityChanged();
-}
-
-function bindOnSelectNode() {
-	// Fires when the user selects a node (by clicking on it)
-	$('#tree').on('select_node.jstree', function (_, { node }) {
-		tasks.answers[tasks.idx] = getNodePath(node);
-		enableButton('#nextTaskButton');
-
-		socket.emitSelectNodeEvent(node);
-	});
-}
-
-function bindOnDeselectNode() {
-	// Fires when the user de-selects a node (by clicking on a selected node)
-	$('#tree').on("deselect_node.jstree", function (_, _) {
-		disableButton('#nextTaskButton');
-	});
-}
-
-function bindEmitOnOpenNode() {
-	// Fires when the user opens a parent node to expose its children, either by
-	// activating the parent node itself, or by activating the button next to it
-	$('#tree').on('open_node.jstree', function (_, { node }) {
-		socket.emitOpenNodeEvent(node);
-	});
-}
-
-function bindEmitOnCloseNode() {
-	// Fires when the user close a parent node to hideits children, either by
-	// activating the parent node itself, or by activating the button next to it
-	$('#tree').on('close_node.jstree', function (_, { node }) {
-		socket.emitCloseNodeEvent(node);
-	});
-}
-
-function bindEmitOnTaskChanged() {
-	window.addEventListener('taskchanged', () => socket.emitTaskChangedEvent());
-}
-
-function bindEmitOnGiveUp() {
-	window.addEventListener('giveup', () => socket.emitGiveUpEvent());
-}
-
-
-function bindEmitOnTreeTestCompletion() {
-	window.addEventListener('treetestcompleted', () => socket.emitTreeTestCompletedEvent());
-}
-
-function bindEmitOnWindowVisibilityChanged() {
-	document.addEventListener('visibilitychange', () => {
-		socket.emitWindowVisibilityChangedEvent(document.visibilityState);
-	});
-}
-
-},{"uuid":2}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -395,7 +78,7 @@ var _stringify = _interopRequireDefault(require("./stringify.js"));
 var _parse = _interopRequireDefault(require("./parse.js"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-},{"./nil.js":4,"./parse.js":5,"./stringify.js":9,"./v1.js":10,"./v3.js":11,"./v4.js":13,"./v5.js":14,"./validate.js":15,"./version.js":16}],3:[function(require,module,exports){
+},{"./nil.js":3,"./parse.js":4,"./stringify.js":8,"./v1.js":9,"./v3.js":10,"./v4.js":12,"./v5.js":13,"./validate.js":14,"./version.js":15}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -619,7 +302,7 @@ function md5ii(a, b, c, d, x, s, t) {
 
 var _default = md5;
 exports.default = _default;
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -628,7 +311,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _default = '00000000-0000-0000-0000-000000000000';
 exports.default = _default;
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -674,7 +357,7 @@ function parse(uuid) {
 
 var _default = parse;
 exports.default = _default;
-},{"./validate.js":15}],6:[function(require,module,exports){
+},{"./validate.js":14}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -683,7 +366,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
 exports.default = _default;
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -710,7 +393,7 @@ function rng() {
 
   return getRandomValues(rnds8);
 }
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -815,7 +498,7 @@ function sha1(bytes) {
 
 var _default = sha1;
 exports.default = _default;
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -855,7 +538,7 @@ function stringify(arr, offset = 0) {
 
 var _default = stringify;
 exports.default = _default;
-},{"./validate.js":15}],10:[function(require,module,exports){
+},{"./validate.js":14}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -963,7 +646,7 @@ function v1(options, buf, offset) {
 
 var _default = v1;
 exports.default = _default;
-},{"./rng.js":7,"./stringify.js":9}],11:[function(require,module,exports){
+},{"./rng.js":6,"./stringify.js":8}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -980,7 +663,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const v3 = (0, _v.default)('v3', 0x30, _md.default);
 var _default = v3;
 exports.default = _default;
-},{"./md5.js":3,"./v35.js":12}],12:[function(require,module,exports){
+},{"./md5.js":2,"./v35.js":11}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1059,7 +742,7 @@ function _default(name, version, hashfunc) {
   generateUUID.URL = URL;
   return generateUUID;
 }
-},{"./parse.js":5,"./stringify.js":9}],13:[function(require,module,exports){
+},{"./parse.js":4,"./stringify.js":8}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1097,7 +780,7 @@ function v4(options, buf, offset) {
 
 var _default = v4;
 exports.default = _default;
-},{"./rng.js":7,"./stringify.js":9}],14:[function(require,module,exports){
+},{"./rng.js":6,"./stringify.js":8}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1114,7 +797,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const v5 = (0, _v.default)('v5', 0x50, _sha.default);
 var _default = v5;
 exports.default = _default;
-},{"./sha1.js":8,"./v35.js":12}],15:[function(require,module,exports){
+},{"./sha1.js":7,"./v35.js":11}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1132,7 +815,7 @@ function validate(uuid) {
 
 var _default = validate;
 exports.default = _default;
-},{"./regex.js":6}],16:[function(require,module,exports){
+},{"./regex.js":5}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1154,4 +837,8 @@ function version(uuid) {
 
 var _default = version;
 exports.default = _default;
-},{"./validate.js":15}]},{},[1]);
+},{"./validate.js":14}],16:[function(require,module,exports){
+const { v4: uuidv4 } = require('uuid');
+
+window.myUUID = uuidv4(); //global 
+},{"uuid":1}]},{},[16]);
