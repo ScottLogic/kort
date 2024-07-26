@@ -1,4 +1,15 @@
-const { v4: uuidv4 } = uuid;
+const uuid = require('uuid');
+
+// ---------------------- Initialize setup ---------------------------
+$(function() {
+    var studyTasks = $('#studyTasks').data("value");
+    var selectableParents = $('#selectableParents').data('value');
+    var showSiblings = $('#showSiblings').data('value');
+    var treeData = $("#treedata").val();
+   
+    setup(studyTasks,treeData,selectableParents,showSiblings);
+})
+
 //--------------------Initialize Treeview Object---------------------
 function bindNextButton(){
 	$("#nextTaskButton").on("click", function() {
@@ -200,7 +211,7 @@ var socket = {
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			_id: uuidv4(),
+			_id: uuid.v4(),
 			type: eventType,
 			responseId: document.getElementById('resid').value,
 			isoTimestampSent: new Date().toISOString(),
