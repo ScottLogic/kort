@@ -32,15 +32,17 @@ export class StudiesPage {
         await row.locator('a:has-text("Edit")').click();    
     }
 
-    async clickEditButtonForFirstTableRow(rowName = null) {
+    //Setting the default row name to Default tree test - 
+    //if it has been changed it likely is part of another test
+    async clickEditButtonForFirstTableRow(rowName = 'Default Tree Test Title') {
         this.clickStudyRowButton('Edit', rowName);  
     }
 
-    async clickPreviewButtonForFirstTableRow(rowName = null) {
+    async clickPreviewButtonForFirstTableRow(rowName = 'Default Tree Test Title') {
         this.clickStudyRowButton('Preview', rowName);    
     }
 
-    async clickResultsButtonForFirstTableRow(rowName = null) {
+    async clickResultsButtonForFirstTableRow(rowName = 'Default Tree Test Title') {
         this.clickStudyRowButton('Results', rowName);    
     }
 
