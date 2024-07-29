@@ -104,7 +104,10 @@ create a user for the `kort` database by doing the following:
 
 3. Run `npm install` on the commandline.  This will install the dependencies into the `node_modules` folder.
 
-4. Run `node app.js` from the main directory.  This will start the NodeJS server
+4. Run `npm run build` on the commandline. This will setup browserify bundle, which is needed for browser 
+imports of modules. You will see `bundle.js` in the `dist` folder.
+
+5. Run `node app.js` from the main directory.  This will start the NodeJS server
 on the default port 3000.
 
 <a name="ViaDocker"/>

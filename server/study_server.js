@@ -159,6 +159,7 @@ module.exports = {
         if (req.body.resid === "preview") {
             res.redirect('/studies');
             res.end();
+            return;
         }
 
         function updateStudy() {
