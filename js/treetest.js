@@ -199,7 +199,7 @@ var socket = {
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			_id: myUUID,
+			_id: generateUUID(),
 			type: eventType,
 			responseId: document.getElementById('resid').value,
 			isoTimestampSent: new Date().toISOString(),

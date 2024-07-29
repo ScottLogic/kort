@@ -840,5 +840,14 @@ exports.default = _default;
 },{"./validate.js":14}],16:[function(require,module,exports){
 const { v4: uuidv4 } = require('uuid');
 
-window.myUUID = uuidv4(); //global 
+function generateUUID() {
+    return uuidv4();
+}
+
+// Expose generateUUID globally
+if (typeof window !== 'undefined') {
+    window.generateUUID = generateUUID;
+}
+
+module.exports = generateUUID;
 },{"uuid":1}]},{},[16]);
