@@ -212,3 +212,80 @@ test('Unique link Multiple Correct Users', async ({ studiesPage, resultsPage, ed
     await studiesPage.goto();
     await studiesPage.deleteStudy(testName);
 });
+
+test('Unique link Multiple Incorrect Users', async ({ studiesPage, resultsPage, editTreeTestPage, treeTestStudy}) => {
+    await studiesPage.clickNewStudy();
+
+    const users = ["UserOne", "UserTwo"];
+    const testName = "ResultPage Multiple Incorrect User";
+
+    //Sets up unique link
+    await studiesPage.clickEditButtonForFirstTableRow();
+    await expect(editTreeTestPage.header).toContainText('Edit Tree Test');
+    await editTreeTestPage.changeTestTitle(testName);
+    await studiesPage.clickEditButtonForFirstTableRow(testName);
+    await editTreeTestPage.acceptResponses.click();
+    await editTreeTestPage.uniqueParticipantLinkRadioButton.click();
+    for(let user of users) {
+        await editTreeTestPage.addParticipantName(user) ;
+    }
+
+    await editTreeTestPage.submitButton.click();
+
+    for(let user of users) {
+        //Navigate to page again after saving
+        await studiesPage.clickEditButtonForFirstTableRow(testName);
+
+        //Taking the unique URL from the page, and passing it to the preview page
+        await treeTestStudy.goto(await editTreeTestPage.copyUniqueLink(user));
+
+        //Runs through tree tests
+        //First question
+        await expect(treeTestStudy.header).toContainText(testName);
+        await expect(treeTestStudy.taskNum).toContainText('Task 1 of 2');
+        await expect(treeTestStudy.taskQuestion).toContainText('Where is the Apples?');
+        await treeTestStudy.selectNode('Meats', 'Bacon');
+        await treeTestStudy.nextConfirm();
+
+        //Second question
+        await expect(treeTestStudy.taskNum).toContainText('Task 2 of 2');
+        await expect(treeTestStudy.taskQuestion).toContainText('Where is the Bacon?');
+        await treeTestStudy.selectNode("Fruits","Apple");
+        await treeTestStudy.finishConfirm();
+
+        //Confirmation message
+        await expect(treeTestStudy.thankYouMessage).toContainText('Thank you.');
+        await studiesPage.goto();
+    }
+
+    //Navigate back to the studies table, and view results for the test
+    await studiesPage.goto();
+    await studiesPage.clickResultsButtonForFirstTableRow(testName);
+
+    //Results page assertions
+    const answerOne = 'Meats/Bacon';
+    const answerTwo = 'Fruits/Apple';
+    await resultsPage.headerText(testName);
+    await expect(resultsPage.header).toContainText(testName);
+    await expect(resultsPage.responseCounter).toContainText('2');
+
+    for(let user of users) {
+        await resultsPage.responses(user);
+        await resultsPage.dataByResponse(user, answerOne, answerTwo);
+        await expect(resultsPage.dataNameCell).toContainText(user);
+        await expect(resultsPage.task1Cell).toContainText(answerOne);
+        await expect(resultsPage.task2Cell).toContainText(answerTwo);
+    }
+
+    await resultsPage.responsesByTask('Where is the Apples?');
+    await expect(resultsPage.taskCell).toContainText(answerOne);
+    await expect(resultsPage.taskCell).toContainText('2 of 2');
+
+    await resultsPage.responsesByTask('Where is the Bacon?');
+    await expect(resultsPage.taskCell).toContainText(answerTwo);
+    await expect(resultsPage.taskCell).toContainText('2 of 2');
+
+    //Delete Studuies
+    await studiesPage.goto();
+    await studiesPage.deleteStudy(testName);
+});
