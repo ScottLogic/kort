@@ -1,4 +1,3 @@
-
 //--------------------Initialize Treeview Object---------------------
 function bindNextButton(){
 	$("#nextTaskButton").on("click", function() {
@@ -200,7 +199,7 @@ var socket = {
 
 	_emitEvent: function(data, eventType) {
 		const json = JSON.stringify({
-			_id: crypto.randomUUID(),
+			_id: generateUUID(),
 			type: eventType,
 			responseId: document.getElementById('resid').value,
 			isoTimestampSent: new Date().toISOString(),

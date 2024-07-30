@@ -198,56 +198,75 @@ module.exports = {
     },
     submitResult: function (req, res, next) {
         var clean_id = sanitize(req.body.id);
+        var clean_resid = sanitize(req.body.resid);
 
-         Study.findOne({_id: clean_id}, function (err, study) {
-            if (err) {
-                res.status(504);
-                logger.error("study_server.js: Error in submit result:", err);
-                res.end(err);
-            } else {
-                //if the study is being previewed, don't record the response
-                if (req.body.resid === "preview"){
-                    res.redirect('/studies');
+        //if the study is being previewed, don't record the response
+        if (req.body.resid === "preview") {
+            res.redirect('/studies');
+            res.end();
+            return;
+        }
+
+        function updateStudy() {
+            Study.findOneAndUpdate(
+                { "_id": clean_id },
+                {
+                    "$pull": { "incompleteResponses": mongoose.Types.ObjectId(clean_resid) },
+                    "$push": { "completeResponses": clean_resid }
+                },
+                function (err) {
+                    if (err) {
+                        logger.error("study_server.js: Error has occured: ", err);
+                        res.status(500).send(err);
+                        res.end();
+                    } else {
+                        logger.info("study_server.js: Response saved successfully to study.");
+                        res.redirect('/msg/thanks');
+                        res.end();
+                    } 
+                }
+            );
+    }
+    
+    function saveResponse() {
+        return new Promise((resolve, reject) => {
+            Response.findOne({ _id: clean_resid }).then(response => {
+                if (!response) {
+                    logger.error("study_server.js: Response not found");
+                    res.status(404).send("Response not found");
                     res.end();
+                    reject(false);
+                } else if (response.complete) {
+                    logger.error("study_server.js: The response has already been completed");
+                    res.redirect('/msg/nomore');
+                    res.end();
+                    reject(false);
                 } else {
-                    var clean_resid = sanitize(req.body.resid);
-
-                    Response.findOne({_id: clean_resid}, function(err,response) {
-                        if (err) {
-                            req.status(504);
-                            logger.error("response_server.js: Cannot find study responses to delete:", error);
-                            req.end();
-                        } else {
-                            if (response.complete){
-                                res.redirect('/msg/nomore');
-                                res.end();
-                            } else {
-                                 Response.findOneAndUpdate({"_id": clean_resid},
-                                    { "$set": { "complete": true,
-                                                "date": new Date(Date.now()),
-                                                "data": JSON.parse(req.body.result)}
-                                    }).exec(function(err, book){
-                                       if(err) {
-                                           console.log(err);
-                                           res.status(500).send(err);
-                                       }
-                                });
-                                //move response object from incompleteResponses to completeResponses
-                                var respIdx = study.incompleteResponses.indexOf(req.body.resid);
-                                study.completeResponses.push(study.incompleteResponses[respIdx]);
-                                study.incompleteResponses.splice(respIdx,1);
-                                //save the study object (which will save the child objects)
-                                study.save();
-                                res.redirect('/msg/thanks');
-                                res.end();
+                    Response.findOneAndUpdate(
+                        { "_id": clean_resid },
+                        {
+                            "$set": {
+                                "complete": true,
+                                "date": new Date(Date.now()),
+                                "data": JSON.parse(req.body.result)
                             }
                         }
+                    ).then(() => {
+                        resolve(true);
                     });
-
                 }
+            })
+        })
+    }
+    
+    let promise = saveResponse();
+    
+    promise.then((value) => {
+        if (value) {
+           updateStudy();
+        }
+    });
 
-            }
-        });
     },
     deleteAllIncompleteResponses: function(req, res, next) {
         Study.findOne({ _id: req.params.id, ownerID: req.user._id}, function(err, study) {
