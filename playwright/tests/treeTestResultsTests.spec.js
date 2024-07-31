@@ -131,9 +131,9 @@ test('Unique link give up results page test', async ({ studiesPage, resultsPage,
     await expect(resultsPage.taskCell).toContainText(answerTwo);
     await expect(resultsPage.taskCell).toContainText('1 of 1');
 
-        //Delete Studuies
-        await studiesPage.goto();
-        await studiesPage.deleteStudy(testName);
+    //Delete Studuies
+    await studiesPage.goto();
+    await studiesPage.deleteStudy(testName);
 });
 
 test('Unique link Multiple Correct Users', async ({ studiesPage, resultsPage, editTreeTestPage, treeTestStudy}) => {
