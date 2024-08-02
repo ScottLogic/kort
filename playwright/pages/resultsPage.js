@@ -21,11 +21,10 @@ export class ResultsPage {
 
     async dataByResponse(name, task1, task2){
         this.dataNameCell = this.dataByResponseTable.locator('td:has-text(\"'+name+'\")').locator('..');
-        this.task1Cell = this.dataByResponseTable.locator('td:has-text(\"'+task1+'\")').locator('..');
-        this.task2Cell = this.dataByResponseTable.locator('td:has-text(\"'+task2+'\")').locator('..');
-    }
+        this.task1Cell = this.dataNameCell.locator('td:has-text(\"'+task1+'\")');
+        this.task2Cell = this.dataNameCell.locator('td:has-text(\"'+task2+'\")');    }
 
     async responsesByTask(task){
-        this.taskCell = this.treeTestTable.locator('td:has-text(\"'+task+'\")', {exact: true}).locator('../..');
+        this.taskCell = this.treeTestTable.locator('td:has-text(\"'+task+'\")', {exact: true}).locator('..');
     }
 }
