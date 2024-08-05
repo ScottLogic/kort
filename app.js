@@ -69,13 +69,20 @@ var app = express();
 //https://expressjs.com/en/advanced/best-practice-security.html
 //https://helmetjs.github.io/docs/
 const helmet = require('helmet');
-app.use(helmet());
+
+app.use(helmet({
+  contentSecurityPolicy: false, 
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false, 
+  originAgentCluster: false,
+})); 
+
 const flash = require('connect-flash');
 var logger = require('./server/logger.js');
 const path = require('path');
 
 // set up rate limiter: maximum of 120 requests per 10 seconds
-const DEFAULT_RATE_LIMIT = 120;
+const DEFAULT_RATE_LIMIT = 10000;
 const requestRateLimit = process.env.RATE_LIMIT  || DEFAULT_RATE_LIMIT;
 
 var rateLimit = require('express-rate-limit');
