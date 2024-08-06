@@ -68,21 +68,30 @@ const bodyParser= require('body-parser');
 var app = express();
 //https://expressjs.com/en/advanced/best-practice-security.html
 //https://helmetjs.github.io/docs/
+const environment = process.env.ENVIRONMENT || 'production';
 const helmet = require('helmet');
+const defaultCspOptions = helmet.contentSecurityPolicy.getDefaultDirectives();
+delete defaultCspOptions["upgrade-insecure-requests"]
 
-app.use(helmet({
-  contentSecurityPolicy: false, 
-  crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: false, 
-  originAgentCluster: false,
-})); 
+
+if (environment != 'production') {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: { ...defaultCspOptions },
+     }
+   })
+ );
+} else {
+  app.use(helmet());
+}
 
 const flash = require('connect-flash');
 var logger = require('./server/logger.js');
 const path = require('path');
 
 // set up rate limiter: maximum of 120 requests per 10 seconds
-const DEFAULT_RATE_LIMIT = 10000;
+const DEFAULT_RATE_LIMIT = 120;
 const requestRateLimit = process.env.RATE_LIMIT  || DEFAULT_RATE_LIMIT;
 
 var rateLimit = require('express-rate-limit');
