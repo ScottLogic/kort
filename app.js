@@ -74,7 +74,7 @@ const defaultCspOptions = helmet.contentSecurityPolicy.getDefaultDirectives();
 delete defaultCspOptions["upgrade-insecure-requests"]
 
 
-if (environment !== 'production') {
+if (environment === 'development') {
   app.use(helmet({
     contentSecurityPolicy: {
       useDefaults: false,
