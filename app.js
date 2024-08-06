@@ -70,11 +70,11 @@ var app = express();
 //https://helmetjs.github.io/docs/
 const environment = process.env.ENVIRONMENT || 'production';
 const helmet = require('helmet');
-const defaultCspOptions = helmet.contentSecurityPolicy.getDefaultDirectives();
-delete defaultCspOptions["upgrade-insecure-requests"]
 
 
 if (environment === 'development') {
+  const defaultCspOptions = helmet.contentSecurityPolicy.getDefaultDirectives();
+  delete defaultCspOptions["upgrade-insecure-requests"]
   app.use(helmet({
     contentSecurityPolicy: {
       useDefaults: false,
