@@ -163,6 +163,8 @@ If the variables are not set, then a default usename and password of `admin`/`ad
 3. The `RATE_LIMIT` variable relates to the maximum number of requests that the server will allow over a 10 second period. By default the rate is set at 120. This can be edited in the `.env` file or as an environment variable. **Please note that if you define these variables using both methods, the environment variables will take precedence.**
 **Please note this rate includes any requests the application makes to serve the ui pages such as css and js files, and can make over 20 requests per page.**
 
+4. The `ENVIRONMENT` variable controls the Helmet settings. When the variable is set to `development`, we override certain security headers to facilitate load testing. In any other mode, it defaults to `production` and applies the strict security headers defined by Helmet.
+
 <a name="Support"/>
 
 ## Support / Improvement / Suggestions
