@@ -78,8 +78,15 @@ if (environment === 'development') {
   app.use(helmet({
     contentSecurityPolicy: {
       useDefaults: false,
-      directives: { ...defaultCspOptions },
-     }
+      directives: { 
+        ...defaultCspOptions,
+        'worker-src': ["'self'", "blob:"], 
+       },
+     },
+     crossOriginOpenerPolicy: false,
+     crossOriginEmbedderPolicy: false,
+     originAgentCluster: false,
+
    })
  );
 } else {
