@@ -13,7 +13,7 @@ export class StudiesPage {
     }
 
     async goto() {
-        await this.page.goto('http://localhost:3000/studies');
+        await this.page.goto('/studies');
     }
 
     async clickNewStudy() {

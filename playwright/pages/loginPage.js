@@ -11,9 +11,8 @@ export class LoginPage {
     }
 
     async goto() {
-        //TODO: Remove timeout once Kort throttling is fixed
-        // await this.page.waitForTimeout(2000);
-        await this.page.goto('http://localhost:3000/');
+
+        await this.page.goto('/');
     }
 
     async login(username, password) {

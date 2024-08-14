@@ -14,7 +14,7 @@ export class OverviewPage {
     }
 
     async goto() {
-        await this.page.goto('http://localhost:3000/overview');
+        await this.page.goto('/overview');
     }
 
     async clickGoToStudies() {

@@ -25,11 +25,7 @@ export class UsersPage {
         await this.emailField.fill(username);
         await this.passwordField.fill(password);
 
-        //TODO: Remove timeouts when kort throttling is resolved
-        await this.page.waitForTimeout(2000);
         await this.page.locator('button:text("Add User")').click();
-        //TODO:Remove timeout when kort throttling is resolved
-        await this.page.waitForTimeout(2000);
     }
 
     async deleteUser(username) {
