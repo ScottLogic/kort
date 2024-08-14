@@ -68,8 +68,31 @@ const bodyParser= require('body-parser');
 var app = express();
 //https://expressjs.com/en/advanced/best-practice-security.html
 //https://helmetjs.github.io/docs/
+const environment = process.env.ENVIRONMENT || 'production';
 const helmet = require('helmet');
-app.use(helmet());
+
+
+if (environment === 'development') {
+  const defaultCspOptions = helmet.contentSecurityPolicy.getDefaultDirectives();
+  delete defaultCspOptions["upgrade-insecure-requests"]
+  app.use(helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: { 
+        ...defaultCspOptions,
+        'worker-src': ["'self'", "blob:"], 
+       },
+     },
+     crossOriginOpenerPolicy: false,
+     crossOriginEmbedderPolicy: false,
+     originAgentCluster: false,
+
+   })
+ );
+} else {
+  app.use(helmet());
+}
+
 const flash = require('connect-flash');
 var logger = require('./server/logger.js');
 const path = require('path');
